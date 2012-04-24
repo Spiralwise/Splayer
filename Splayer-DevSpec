@@ -1,0 +1,36 @@
+// IHM - Projet 2 : Splayer
+// @title  Development Specification
+// @author Sébastien Poulmane
+// @update 2012-04-17
+
+
+Paradigme MVC
+-------------
+Le projet est basé sur le principe MVC :
+
+* SplayerEngine (Controler) : Gère les musiques et exécute leur lecture.
+* SplayerViewManager (View) : Gère les fenêtres de l'application.
+* SplayerDataManager (Model) : Gère la base de données. Il contient les musiques et les playlists.
+
+
+SplayerViewManager
+------------------
+Le SVM possède 3 vues principales :
+
+* Player : Contient les éléments interactifs pour la lecture et affiche les informations importantes sur la lecture en cours.
+* Playlist : Affiche la liste de lecture en cours.
+* Library : Affiche les playlists disponibles.
+
+Il charge en fait des fenêtres modules. Le SVM Builder construit l'interface par l'intermédiaire d'un fichier xml qui décrit la forme de l'interface.
+
+
+Packages
+--------
+Les différents packages constituant l'application sont : 
+
+* splayer : contient les moteurs essentiels de l'application.
+* engine : controleur
+* view : vue
+* data : modèle
+
+Le main n'est pas dans un package.
