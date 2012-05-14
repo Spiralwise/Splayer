@@ -1,10 +1,17 @@
+import data.SplayerDataManager;
+import engine.SplayerEngine;
+import view.SplayerViewBuilder;
+import view.SplayerViewManager;
+
+
 public class Splayer 
 {
     public static void main(String [] args)
     {
-        // TODO Appeler le SVM Builder
+        SplayerViewManager svm = new SplayerViewManager();
+        SplayerViewBuilder.build(svm);
         
-        
-        // TODO Appeler le SplayerEngine
+        SplayerDataManager sdm = new SplayerDataManager();
+        SplayerEngine engine   = new SplayerEngine();
     }
 }
