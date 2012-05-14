@@ -1,25 +1,40 @@
 package view;
 
-import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JFrame;
 
+import view.action.ActionOpenPlaylist;
 
-public class SplayerViewManager {
 
-    // NOTE La première vue est la main view.
-    private ArrayList<JFrame> views;
+public class SplayerViewManager implements Observer {
+
+    /* Data stae */
+    private SplayerViewMain viewMain;
+    private SplayerViewPlaylist viewPlaylist;
     
-    public SplayerViewManager() {
-        this.views = new ArrayList<JFrame>();
+    /* Builder stage */
+    public SplayerViewManager()
+    {
+        // Building
+        this.viewMain       = new SplayerViewMain();
+        this.viewPlaylist   = new SplayerViewPlaylist();
+        
+        // Action mapping
+        this.viewMain.setAction("PLAYLIST", new ActionOpenPlaylist(viewPlaylist));
+        System.out.println("SplayerViewManager initialized.");
     }
-    
-    /**
-     * Ajoute une vue au SVM
-     * @param module Vue à ajouter
-     */
-    public void add(JFrame module) {
-        views.add(module);
+
+    @Override
+    public void update(Observable model, Object obj) {
+        System.out.println("SVM:Perform update");
+    }
+
+    /* Implementation stage */
+    public void go()
+    {
+        viewMain.setVisible(true);
     }
       
 }

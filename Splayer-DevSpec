@@ -24,6 +24,14 @@ Le SVM possède 3 vues principales :
 Il charge en fait des fenêtres modules. Le SVM Builder construit l'interface par l'intermédiaire d'un fichier xml qui décrit la forme de l'interface.
 
 
+SplayerDataManager
+------------------
+Le SDM gère les librairies et les playlists. Il fait le lien entre la base de données et l'application. Le chargement de fichier est de son ressort.
+
+* Les musiques sont représentées par la classe MP3File qui contient à la fois le fichier et les informations des tags ID3.
+* Les playlistes sont représentées par la classe Playlist qui est un ensemble ordonné de musiques.
+
+
 Packages
 --------
 Les différents packages constituant l'application sont : 

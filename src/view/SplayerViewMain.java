@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashMap;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,7 +32,6 @@ public class SplayerViewMain extends JFrame {
     // Interactive components
     private HashMap<String, JButton> buttonPlayer;
     private JSlider sliderPlayer, sliderVolume;
-    // Actions
     
     public SplayerViewMain()
     {
@@ -63,13 +63,10 @@ public class SplayerViewMain extends JFrame {
         
         // TODO Trouver un meilleur emplacement
         buttonPlayer.put("PLAYLIST", new JButton("Playlist"));
-        buttonPlayer.put("LIBRARY", new JButton("Library"));
         
         sliderPlayer = new JSlider(0, 100, 0);
         sliderVolume = new JSlider(0, 100, 25);
-        
-        // Actions
-        
+                
         // Layout
         GridBagConstraints layoutManager = new GridBagConstraints();
         layoutManager.fill = GridBagConstraints.NONE;
@@ -110,7 +107,6 @@ public class SplayerViewMain extends JFrame {
         controlerPanel.add(buttonPlayer.get("next"));
         controlerPanel.add(buttonPlayer.get("random"));
         controlerPanel.add(buttonPlayer.get("PLAYLIST"));
-        controlerPanel.add(buttonPlayer.get("LIBRARY"));
         
             // Layout building
         layoutManager.gridx = layoutManager.gridy = 0;
@@ -125,13 +121,19 @@ public class SplayerViewMain extends JFrame {
         panel.add(sliderPlayer, layoutManager);
         layoutManager.gridy = 2;
         panel.add(controlerPanel, layoutManager);
-        
-        this.add(panel);
-        
+                
         // Packing
+        this.add(panel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        //this.setVisible(true);
+            // NOTE C'est le SplayerEngine qui donne le top.
+    }
+    
+    /* Action stage */
+    public void setAction(String buttonName, AbstractAction action)
+    {
+        buttonPlayer.get(buttonName).setAction(action);
     }
 }
