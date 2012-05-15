@@ -30,7 +30,7 @@ public class SplayerViewMain extends JFrame {
     // Text
     private HashMap<String, JLabel> display;
     // Interactive components
-    private HashMap<String, JButton> buttonPlayer;
+    private HashMap<String, JButton> buttonPlayer; // TODO Les bouttons sont des actions et pour bien découper le code, il faudrait qu'ils se trouvent dans le SVM.
     private JSlider sliderPlayer, sliderVolume;
     
     public SplayerViewMain()

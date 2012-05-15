@@ -8,8 +8,8 @@ public class Splayer
     public static void main(String [] args)
     {
         /* Initialization stage */
-        SplayerViewManager svm = new SplayerViewManager();        
         SplayerDataManager sdm = new SplayerDataManager();
+        SplayerViewManager svm = new SplayerViewManager();        
         SplayerEngine engine   = new SplayerEngine(sdm, svm);
         
         /* Launch stage */
