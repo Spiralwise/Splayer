@@ -33,7 +33,6 @@ public class SplayerViewManager implements Observer {
 
     @Override
     public void update(Observable model, Object obj) {
-        System.out.println("SVM:Perform update");
         this.viewPlaylist.setPlaylist(((SplayerDataManager)model).getPlaylist());
     }
 

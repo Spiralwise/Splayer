@@ -45,19 +45,37 @@ public class Player extends Thread {
             Load(currentPath);
             PlayPause();
         }else if(state == 1){
-            LaunchListenThread llt = new LaunchListenThread(player);
-            llt.start();
-            state = 2;
+            if( !currentPath.equals("") ) {
+                LaunchListenThread llt = new LaunchListenThread(player);
+                llt.start();
+                state = 2;
+            }
+            else {
+               System.out.println("No music loaded.");
+                state = 0;
+            }
         }else if(state == 2){
             player.pause();
         }
     }
     
-    public void Stop(){         
+    public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrête la musique.
         if(state == 1 || state == 2){
             player.close();
             state = 0;
         }
+    }
+    
+    /**
+     * Modifie le path de la musique à jouer.
+     * @param path
+     */
+    public void setPath(String path) {
+        currentPath = path;
+    }
+    
+    public int getPlayerState() {
+        return state;
     }
     
     public float getVolume(){
@@ -88,17 +106,7 @@ public class Player extends Thread {
         position = pos;
     }
     
-    public void run()
-    {
-        System.out.println("Player: Playing " + currentPath);
-        try {
-            player.play();
-        } catch(JavaLayerException exception) {
-            exception.printStackTrace();
-        }
-    }
-    
-    /*class LaunchListenThread extends Thread{
+    class LaunchListenThread extends Thread{
         private LillePlayer playerInterne;
         public LaunchListenThread(LillePlayer p){
             playerInterne = p;
@@ -112,7 +120,7 @@ public class Player extends Thread {
                 while(!playerInterne.isComplete()){
                     position = playerInterne.getPosition();
                     if(player == playerInterne)
-                        System.out.println("PositionEvent");
+                        //System.out.println("PositionEvent");
                     try{
                         Thread.sleep(200);
                     }catch(Exception e){ e.printStackTrace(); }
@@ -130,6 +138,6 @@ public class Player extends Thread {
                 }catch(JavaLayerException e){ e.printStackTrace(); }
             }
         }
-    }*/
+    }
 
 }

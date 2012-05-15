@@ -5,7 +5,6 @@ import java.util.Observable;
 
 import javax.swing.DefaultListModel;
 
-import org.farng.mp3.MP3File;
 import org.farng.mp3.TagException;
 
 public class SplayerDataManager extends Observable {
@@ -28,6 +27,11 @@ public class SplayerDataManager extends Observable {
         this.setChanged();
     }
     
+    /* Implementation stage */
+    /**
+     * Ajoute une musique ˆ la suite de la playlist courrante.
+     * @param music
+     */
     public void addToPlaylist(Music music)
     {
         playlist.add(music);
@@ -35,10 +39,21 @@ public class SplayerDataManager extends Observable {
         notifyObservers();
     }
     
+    /**
+     * Renvoie pour une JList un ListModel de la playlist.
+     * @return un ListModel de la playlist
+     */
     public DefaultListModel getPlaylist()
     {
-        System.out.println("dbg: SDM: current=" + playlist.getCurrentMusic());
         return playlist.getList();
     }
 
+    /**
+     * Renvoie le path de la musique en cours de lecture ˆ charger.
+     * @return path de la musique en cours
+     */
+    public String getCurrentMusicPath()
+    {
+        return playlist.getCurrentMusic();
+    }
 }

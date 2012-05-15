@@ -15,14 +15,17 @@ public class SplayerEngine {
     /* Builder stage */
     public SplayerEngine(SplayerDataManager sdm, SplayerViewManager svm)
     {
+        // Init
         this.player = new Player();
         this.sdm = sdm;
         this.svm = svm;
         
+        // MVC is magic !
         this.sdm.addObserver(this.svm);
         this.sdm.notifyObservers();
         
-        this.svm.setAction("play", new ActionPlay(player));
+        // Action mapping
+        this.svm.setAction("play", new ActionPlay(this));
         this.svm.setPlaylistHandler(new MusicHandler(this.sdm));
         
         System.out.println("SplayerEngine initialized.");
@@ -36,5 +39,15 @@ public class SplayerEngine {
     public void launch()
     {
         svm.go();
+    }
+
+    /**
+     * Démarre/arrête la lecture de la musique en cours.
+     */
+    public void playPause()
+    {
+        if( player.getPlayerState() == 0 )
+            player.setPath(sdm.getCurrentMusicPath());
+        player.PlayPause();
     }
 }

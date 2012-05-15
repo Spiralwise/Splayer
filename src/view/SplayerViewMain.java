@@ -124,7 +124,7 @@ public class SplayerViewMain extends JFrame {
                 
         // Packing
         this.add(panel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // TODO remplacer l'action pour fermer le player proprement avant.
         this.pack();
         this.setLocationRelativeTo(null);
         //this.setVisible(true);

@@ -11,6 +11,11 @@ public class Music extends MP3File {
     {
         super(filename);
     }
+    
+    public String getPath()
+    {
+        return this.getMp3file().getAbsolutePath();
+    }
 
     public String toString()
     {

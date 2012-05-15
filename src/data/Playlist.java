@@ -1,10 +1,7 @@
 package data;
 
-import java.util.ArrayList;
-
 import javax.swing.DefaultListModel;
 
-import org.farng.mp3.MP3File;
 
 public class Playlist {
 
@@ -28,6 +25,8 @@ public class Playlist {
     
     public DefaultListModel getList()
     {
+        if( list.getSize() == 0 )
+            return null;
         return list;
     }
     
@@ -49,8 +48,12 @@ public class Playlist {
         list.addElement(music);
     }
     
-    public Music getCurrentMusic()
+    /**
+     * Retourne le path de la musique en cours.
+     * @return
+     */
+    public String getCurrentMusic()
     {
-        return (Music)list.getElementAt(index);
+        return ((Music)list.getElementAt(index)).getPath();
     }
 }

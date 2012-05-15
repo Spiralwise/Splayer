@@ -4,22 +4,22 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import engine.Player;
+import engine.SplayerEngine;
 
 @SuppressWarnings("serial")
 public class ActionPlay extends AbstractAction {
 
-    private Player player;
+    private SplayerEngine engine;
     
-    public ActionPlay(Player player)
+    public ActionPlay(SplayerEngine engine)
     {
-        this.player = player;
+        this.engine = engine;
     }
     
     @Override
     public void actionPerformed(ActionEvent event)
     {
-        player.start();
+        engine.playPause();
     }
     
 }
