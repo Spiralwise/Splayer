@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,8 +15,8 @@ import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Classe représentant la fenêtre principale
- * @author Sébastien Poulmane & Loïc Daara
+ * Classe representant la fenetre principale
+ * @author Sebastien Poulmane & Loic Daara
  *
  */
 @SuppressWarnings("serial")
@@ -30,7 +31,7 @@ public class SplayerViewMain extends JFrame {
     // Text
     private HashMap<String, JLabel> display;
     // Interactive components
-    private HashMap<String, JButton> buttonPlayer; // TODO Les bouttons sont des actions et pour bien découper le code, il faudrait qu'ils se trouvent dans le SVM.
+    private HashMap<String, JButton> buttonPlayer; // TODO Les bouttons sont des actions et pour bien dÈcouper le code, il faudrait qu'ils se trouvent dans le SVM.
     private JSlider sliderPlayer, sliderVolume;
     
     public SplayerViewMain()
@@ -39,10 +40,10 @@ public class SplayerViewMain extends JFrame {
         super("Splayer");
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));	// Leaves a transparent margin without any associated drawing.
         
-        // Data 
-        
+        // Data
+
         // Components
         display = new HashMap<String, JLabel>();
         display.put("time", new JLabel("0:00"));
@@ -50,19 +51,30 @@ public class SplayerViewMain extends JFrame {
         display.put("artist", new JLabel("John Doe"));
         display.put("title", new JLabel("Soft Kitty"));
         display.put("album", new JLabel("Sweet Songs When Being Sick"));
-        
-        // TODO Crée des icônes et si possible des boutons non-rectangulaires
+
+        // TODO Cree des icones et si possible des boutons non-rectangulaires (LoÔc: Ckecker et supprimer)
         buttonPlayer = new HashMap<String, JButton>();
-        buttonPlayer.put("play", new JButton(">"));
-        buttonPlayer.put("previous", new JButton("|<"));
-        buttonPlayer.put("next", new JButton(">|"));
-        buttonPlayer.put("rewind", new JButton("<<"));
-        buttonPlayer.put("forward", new JButton(">>"));
-        buttonPlayer.put("loop", new JButton("O"));
-        buttonPlayer.put("random", new JButton("R"));
+//        buttonPlayer.put("play", new JButton(">"));
+//        buttonPlayer.put("previous", new JButton("|<"));
+//        buttonPlayer.put("next", new JButton(">|"));
+//        buttonPlayer.put("rewind", new JButton("<<"));
+//        buttonPlayer.put("forward", new JButton(">>"));
+//        buttonPlayer.put("loop", new JButton("O"));
+//        buttonPlayer.put("random", new JButton("R"));
+        
+        // Icones simples en fond des rectangles
+        // (loÔc: Attention ‡ l'odre pour le parcours de la hashmap)
+        buttonPlayer.put("loop", new JButton(new ImageIcon("./data/icon/media-repeat.png")));
+        buttonPlayer.put("previous", new JButton(new ImageIcon("./data/icon/media-previous.png")));
+        buttonPlayer.put("rewind", new JButton(new ImageIcon("./data/icon/media-rewind.png")));
+        buttonPlayer.put("play", new JButton(new ImageIcon("./data/icon/media-play-pause-resume.png")));
+        buttonPlayer.put("forward", new JButton(new ImageIcon("./data/icon/media-forward.png")));
+        buttonPlayer.put("next", new JButton(new ImageIcon("./data/icon/media-next.png")));
+        buttonPlayer.put("random", new JButton(new ImageIcon("./data/icon/media-shuffle.png")));
         
         // TODO Trouver un meilleur emplacement
-        buttonPlayer.put("PLAYLIST", new JButton("Playlist"));
+        //buttonPlayer.put("PLAYLIST", new JButton("Playlist"));
+        buttonPlayer.put("PLAYLIST", new JButton(new ImageIcon("./data/icon/media-search.png")));
         
         sliderPlayer = new JSlider(0, 100, 0);
         sliderVolume = new JSlider(0, 100, 25);
@@ -98,7 +110,7 @@ public class SplayerViewMain extends JFrame {
         
             // Controler Panel
         controlerPanel = new JPanel(new FlowLayout());
-        // TODO Faire une boucle plutôt
+        // TODO Faire une boucle plutot (LoÔc: Ckecker et supprimer)
         controlerPanel.add(buttonPlayer.get("loop"));
         controlerPanel.add(buttonPlayer.get("previous"));
         controlerPanel.add(buttonPlayer.get("rewind"));
@@ -107,6 +119,10 @@ public class SplayerViewMain extends JFrame {
         controlerPanel.add(buttonPlayer.get("next"));
         controlerPanel.add(buttonPlayer.get("random"));
         controlerPanel.add(buttonPlayer.get("PLAYLIST"));
+        
+//        for (String mapKey : buttonPlayer.keySet()) {
+//        	 controlerPanel.add(buttonPlayer.get(mapKey));
+//        }
         
             // Layout building
         layoutManager.gridx = layoutManager.gridy = 0;
