@@ -1,7 +1,9 @@
 package view;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.IOException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
@@ -9,24 +11,29 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
 
+import org.farng.mp3.TagException;
+
+import data.Library;
+
 /**
- * Classe représentant la bibliothèque et la playlist.
- * @author Sébastien Poulmane & Loïc Daara
+ * Classe representant la bibliotheque et la playlist.
+ * @author Sebastien Poulmane & Loic Daara
  *
  */
 @SuppressWarnings("serial")
 public class SplayerViewPlaylist extends JFrame {
         
-    /* Interface stage */
-    // Panels
-    private JPanel panel;
-    private JScrollPane scrollPlaylist; // Nécessaire pour rendre une liste visible
-    // Interactive components
-    private JList playlist;
-    private JList library;
+	/* Interface stage */
+	// Panels
+	private JPanel panel;
+	private JScrollPane scrollPlaylist; // Necessaire pour rendre une liste visible
+	// Interactive components
+	private JList playlist;
+	private JTable bibliotheque;
 
     public SplayerViewPlaylist()
     {
@@ -38,18 +45,23 @@ public class SplayerViewPlaylist extends JFrame {
         
         // Components
         playlist = new JList();
-        library = new JList();
-        
         playlist.setDragEnabled(true);
         playlist.setDropMode(DropMode.INSERT);
         scrollPlaylist = new JScrollPane(playlist);
         
         // Layout
         GridBagConstraints layoutManager = new GridBagConstraints();
-        
-        layoutManager.gridx = layoutManager.gridy = 0;
+        layoutManager.gridx = layoutManager.gridy = 1;
         panel.add(scrollPlaylist, layoutManager);
         
+
+//        getContentPane().add(tableau.getTableHeader(), BorderLayout.NORTH);
+//        getContentPane().add(tableau, BorderLayout.CENTER);
+        
+		bibliotheque = new JTable(new Library());
+        getContentPane().add(new JScrollPane(bibliotheque), BorderLayout.CENTER);
+        this.pack();
+
         // Packing
         this.add(panel);
         this.pack();
@@ -64,7 +76,7 @@ public class SplayerViewPlaylist extends JFrame {
     
     /* Implementation stage */
     /**
-     * Spécifie / Met à jour la playlist.
+     * Specifie / Met a jour la playlist.
      * @param list
      */
     public void setPlaylist(DefaultListModel list)
