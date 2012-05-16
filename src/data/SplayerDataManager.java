@@ -56,4 +56,15 @@ public class SplayerDataManager extends Observable {
     {
         return playlist.getCurrentMusic();
     }
+    
+    /**
+     * Passe à la musique suivante ou précédente.
+     * @param forward Si vraie, passe à la musique suivante, sinon à la musique précédente.
+     * @return path de la musique suivante/précédente
+     */
+    public String nextMusic(boolean forward)
+    {
+        playlist.moveIndex(forward);
+        return playlist.getCurrentMusic();
+    }
 }

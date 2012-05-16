@@ -40,6 +40,23 @@ public class Playlist {
     }
     
     /**
+     * Passe ˆ la musique adjacente dans la playlist. Si l'index arrive ˆ la fin, il revient au dŽbut. Et inversement s'il remonte au dŽbut.
+     * @param forward Si vraie, alors passe ˆ la musique suivante. Sinon passe ˆ la musique prŽcŽdente.
+     */
+    public void moveIndex(boolean forward)
+    {
+        if( forward )
+            index++;
+        else
+            index --;
+        
+        if( index > list.getSize() )
+            index = 0;
+        else if( index < 0 )
+            index = list.getSize() - 1;
+    }
+    
+    /**
      * Ajoute une musique ˆ la fin de la playlist.
      * @param music
      */

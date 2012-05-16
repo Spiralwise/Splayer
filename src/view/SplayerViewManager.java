@@ -7,9 +7,9 @@ import javax.swing.AbstractAction;
 import javax.swing.TransferHandler;
 
 import data.SplayerDataManager;
+import engine.action.ActionOpenPlaylist;
+import engine.action.ActionPlay;
 
-import view.action.ActionOpenPlaylist;
-import view.action.ActionPlay;
 
 
 public class SplayerViewManager implements Observer {

@@ -4,13 +4,18 @@ import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.LillePlayer;
 
-public class Player extends Thread {
+public class Player {
+    
+    /* Enum stage */
+    public final static int STOP = 0;
+    public final static int LOAD = 1;
+    public final static int PLAY = 2;
     
     /* Data stage */
     private LillePlayer player;
     private String currentPath;
     
-    private int state;  //0:stop, 1:load, 2:play
+    private int state;
     private float volume = 1;
     private int position = 0;
 
@@ -19,12 +24,12 @@ public class Player extends Thread {
     {
         this.player = null;
         this.currentPath = "";
-        this.state = 0;
+        this.state = STOP;
     }
     
     /* Player stage */
     public void Load(String path){
-        if(state != 0)
+        if(state != STOP)
             Stop();
         
         try{
@@ -33,7 +38,7 @@ public class Player extends Thread {
             player.setVolume(volume);
             Equalizer eq = new Equalizer();
             eq.getBand(0);
-            state = 1;
+            state = LOAD;
         }
         catch(Exception e){
             e.printStackTrace();
@@ -41,28 +46,28 @@ public class Player extends Thread {
     }
 
     public void PlayPause(){
-        if(state == 0){
+        if(state == STOP){
             Load(currentPath);
             PlayPause();
-        }else if(state == 1){
+        }else if(state == LOAD){
             if( !currentPath.equals("") ) {
                 LaunchListenThread llt = new LaunchListenThread(player);
                 llt.start();
-                state = 2;
+                state = PLAY;
             }
             else {
                System.out.println("No music loaded.");
-                state = 0;
+                state = STOP;
             }
-        }else if(state == 2){
+        }else if(state == PLAY){
             player.pause();
         }
     }
     
     public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrête la musique.
-        if(state == 1 || state == 2){
+        if(state == LOAD || state == PLAY){
             player.close();
-            state = 0;
+            state = STOP;
         }
     }
     

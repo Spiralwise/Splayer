@@ -1,9 +1,9 @@
 package engine;
 
 import view.SplayerViewManager;
-import view.action.ActionPlay;
 import data.MusicHandler;
 import data.SplayerDataManager;
+import engine.action.ActionPlay;
 
 public class SplayerEngine {
 
@@ -32,7 +32,7 @@ public class SplayerEngine {
         System.out.println("Splayer ready to launch !");
     }
     
-    /* Implementaton stage */
+    /* SPlayer stage */
     /**
      * Démarre l'application.
      */
@@ -46,8 +46,24 @@ public class SplayerEngine {
      */
     public void playPause()
     {
-        if( player.getPlayerState() == 0 )
+        if( player.getPlayerState() == Player.STOP )
             player.setPath(sdm.getCurrentMusicPath());
         player.PlayPause();
+    }
+    
+    /**
+     * Passe à la musique suivante dans la playlist et la joue si la lecture est en cours.
+     */
+    public void nextMusic()
+    {
+        player.setPath( sdm.nextMusic(true) );
+    } // TODO Si l'utilisateur a désactivé le bouclage, ça ne doit pas boucler !!!!!
+    
+    /**
+     * Passe à la musique précédente dans la playlist et la joue si la lecture est en cours.
+     */
+    public void previousMusic()
+    {
+        player.setPath( sdm.nextMusic(false) );
     }
 }
