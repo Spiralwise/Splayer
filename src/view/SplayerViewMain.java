@@ -3,6 +3,7 @@ package view;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.WindowListener;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
@@ -13,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeListener;
 
 import data.Music;
 
@@ -24,12 +26,10 @@ import data.Music;
 @SuppressWarnings("serial")
 public class SplayerViewMain extends JFrame {
 
-    /* Data stage */
-    
     /* Interface stage*/
     // Panels
     private JPanel panel;
-    private JPanel timePanel, infoPanel, controlerPanel;
+    private JPanel timePanel, infoPanel, volumePanel, controlerPanel;
     // Text
     private HashMap<String, JLabel> display;
     // Interactive components
@@ -43,11 +43,10 @@ public class SplayerViewMain extends JFrame {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));	// Leaves a transparent margin without any associated drawing.
-        
-        // Data
 
         // Components
         display = new HashMap<String, JLabel>();
+        display.put("volume", new JLabel("0"));
         display.put("time", new JLabel("0:00"));
         display.put("left", new JLabel("59:59"));
         display.put("artist", new JLabel("---"));
@@ -55,15 +54,7 @@ public class SplayerViewMain extends JFrame {
         display.put("album", new JLabel("---"));
 
         // TODO Cree des icones et si possible des boutons non-rectangulaires (LoÔc: Ckecker et supprimer)
-        buttonPlayer = new HashMap<String, JButton>();
-//        buttonPlayer.put("play", new JButton(">"));
-//        buttonPlayer.put("previous", new JButton("|<"));
-//        buttonPlayer.put("next", new JButton(">|"));
-//        buttonPlayer.put("rewind", new JButton("<<"));
-//        buttonPlayer.put("forward", new JButton(">>"));
-//        buttonPlayer.put("loop", new JButton("O"));
-//        buttonPlayer.put("random", new JButton("R"));
-        
+        buttonPlayer = new HashMap<String, JButton>(); 
         // Icones simples en fond des rectangles
         // (loÔc: Attention ‡ l'odre pour le parcours de la hashmap)
         buttonPlayer.put("loop", new JButton(new ImageIcon("./data/icon/media-repeat.png")));
@@ -75,7 +66,6 @@ public class SplayerViewMain extends JFrame {
         buttonPlayer.put("random", new JButton(new ImageIcon("./data/icon/media-shuffle.png")));
         
         // TODO Trouver un meilleur emplacement
-        //buttonPlayer.put("PLAYLIST", new JButton("Playlist"));
         buttonPlayer.put("playlist", new JButton(new ImageIcon("./data/icon/media-search.png")));
         
         sliderPlayer = new JSlider(0, 100, 0);
@@ -83,7 +73,7 @@ public class SplayerViewMain extends JFrame {
                 
         // Layout
         GridBagConstraints layoutManager = new GridBagConstraints();
-        layoutManager.fill = GridBagConstraints.NONE;
+        layoutManager.fill = GridBagConstraints.BOTH;
         
             // Time panel
         timePanel = new JPanel();
@@ -108,11 +98,17 @@ public class SplayerViewMain extends JFrame {
         infoPanel.add(display.get("album"), layoutManager);
         
             // Sound Panel
-        // ...
+        volumePanel = new JPanel();
+        volumePanel.setLayout(new GridBagLayout());
+        layoutManager.gridx = layoutManager.gridy = 0;
+        volumePanel.add(new JLabel("ICON"), layoutManager);
+        layoutManager.gridx = 1;
+        volumePanel.add(sliderVolume, layoutManager);
+        layoutManager.gridx = 2;
+        volumePanel.add(display.get("volume"), layoutManager);
         
             // Controler Panel
         controlerPanel = new JPanel(new FlowLayout());
-        // TODO Faire une boucle plutot (LoÔc: Ckecker et supprimer)
         controlerPanel.add(buttonPlayer.get("loop"));
         controlerPanel.add(buttonPlayer.get("previous"));
         controlerPanel.add(buttonPlayer.get("rewind"));
@@ -127,26 +123,29 @@ public class SplayerViewMain extends JFrame {
 //        }
         
             // Layout building
+        // TODO A travailler....
         layoutManager.gridx = layoutManager.gridy = 0;
+        layoutManager.ipadx = 100;
         panel.add(timePanel, layoutManager);
         layoutManager.gridx = 1;
+        layoutManager.ipadx = 0;
         panel.add(infoPanel, layoutManager);
         layoutManager.gridx = 2;
-        panel.add(sliderVolume, layoutManager);
+        layoutManager.gridwidth = GridBagConstraints.REMAINDER;
+        layoutManager.ipadx = 200;
+        panel.add(volumePanel, layoutManager);
         layoutManager.gridx = 0;
         layoutManager.gridy = 1;
-        layoutManager.gridwidth = 3;
+        //layoutManager.gridwidth = 3;
         panel.add(sliderPlayer, layoutManager);
         layoutManager.gridy = 2;
         panel.add(controlerPanel, layoutManager);
                 
         // Packing
         this.add(panel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // TODO remplacer l'action pour fermer le player proprement avant.
         this.pack();
+        this.setResizable(false);
         this.setLocationRelativeTo(null);
-        //this.setVisible(true);
-            // NOTE C'est le SplayerEngine qui donne le top.
     }
     
     /* Action stage */
@@ -161,6 +160,18 @@ public class SplayerViewMain extends JFrame {
     }
     
     /**
+     * Modifie la position du slider de lecture.
+     * /!\ Attention, cette méthode est réservée pour l'update induit par le player.
+     * @param timeInMilliSec
+     */
+    public void setSlider(int timeInMilliSec)
+    {
+        //sliderPlayer.setValueIsAdjusting(false); // Evite au slider d'envoyer un faux-positif de notification de changement
+        sliderPlayer.setValue(timeInMilliSec);
+        //sliderPlayer.setValueIsAdjusting(true);
+    }
+    
+    /**
      * Assopcie un bouton avec une action. Attention, ceci pourrait être modifié si tous les boutons sont gérés par le SplayerViewManager.
      * @param buttonName code bouton à associer (ex: "play" pour le bouton de lecture/pause)
      * @param action AbstractAction à associer
@@ -169,7 +180,17 @@ public class SplayerViewMain extends JFrame {
     {
         buttonPlayer.get(buttonName).setAction(action);
     }
+    
+    public void addVolumeListener(ChangeListener listener)
+    {
+        sliderVolume.addChangeListener(listener);
+    }
 
+    public void addSliderListener(Object listener)
+    {
+        sliderPlayer.addChangeListener((ChangeListener) listener);
+    }
+    
     /* Implementation stage */
     /**
      * Met à jour les données du lecteur selon la musique passé en paramètre.
@@ -181,5 +202,8 @@ public class SplayerViewMain extends JFrame {
         setDisplay("artist", current.getAuthor());
         setDisplay("title", current.getTitle());
         setDisplay("album", current.getAlbum());
-    }
+        int timeInSec = current.getDurationInSec();
+        setDisplay("left", (int)Math.floor(timeInSec/60) + ":" + String.format("%02d", timeInSec%60));
+        sliderPlayer.setMaximum(current.getDuration());
+    }    
 }

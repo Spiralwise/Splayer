@@ -1,6 +1,13 @@
 package data;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
 import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.ID3v2;
@@ -21,6 +28,7 @@ public class Music extends Mp3File {
     private String splayerAuthor;
     private String splayerTitle;
     private String splayerAlbum;
+    private int duration; // En ms
     
     /**
      * Constructeur principal
@@ -62,6 +70,16 @@ public class Music extends Mp3File {
         else {
             // TODO Que faire en cas d'absence de tags ID3 ?
         }
+        // Récupération de la durée
+        try {
+            AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(new File(filename));
+            Map properties = baseFileFormat.properties();
+            duration = (int) ( ((Long)properties.get("duration")).intValue() / 1000 );
+            //duration = (int) ( frames / format.getFrameRate() * 1000 );
+        } catch (UnsupportedAudioFileException e) {
+            duration = 0;
+            e.printStackTrace();
+        }
     }
     
     /* Getter stage */
@@ -78,6 +96,24 @@ public class Music extends Mp3File {
     public String getAlbum()
     {
         return splayerAlbum;
+    }
+    
+    /**
+     * Durée en milliseconde
+     * @return
+     */
+    public int getDuration()
+    {
+        return duration;
+    }
+    
+    /**
+     * Durée en seconde
+     * @return
+     */
+    public int getDurationInSec()
+    {
+        return (int) (duration/1000);
     }
     
     /**

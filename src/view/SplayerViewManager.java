@@ -1,15 +1,21 @@
 package view;
 
 import java.awt.event.MouseListener;
+import java.awt.event.WindowListener;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.AbstractAction;
 import javax.swing.TransferHandler;
+import javax.swing.event.ChangeListener;
 
 import data.Music;
 import data.SplayerDataManager;
+import engine.Player;
 import engine.action.ActionOpenPlaylist;
+import engine.listener.SplayerSliderListener;
+import engine.listener.SplayerVolumeListener;
+import engine.listener.SplayerWindowListener;
 
 
 public class SplayerViewManager implements Observer {
@@ -34,27 +40,41 @@ public class SplayerViewManager implements Observer {
     @Override
     public void update(Observable model, Object obj)
     {
-        SplayerDataManager sdm = (SplayerDataManager)model;
         String argument = (String)obj;
         
-        // Mise à jour de la playlist
+        // Mise à jour du timer
+        if( argument.equals("timerUpdate") )
+    		updateTimer( Math.round( ((Player)model).getPosition() ) );
+        // Mise à jour de la sélection (changement de musique)
         if( argument.equals("playlistSelection") ) {
-            Music current = sdm.getCurrentMusic();
+            Music current = ((SplayerDataManager)model).getCurrentMusic();
             if( current != null ) {
                 this.viewMain.updateData(current);
             }
         }
-        if( argument.equals("playlistUpdate") ) { // TODO créer un enum pour les updates ?
-            this.viewPlaylist.setPlaylist(sdm.getPlaylist());
+        // Ajout d'une musique à playlist
+        else if( argument.equals("playlistUpdate") ) { // TODO créer un enum pour les updates ?
+            this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
+        }
+        // Modification du volume
+        else if( argument.equals("volumeUpdate") ) {
+            this.viewMain.setDisplay("volume", "" + Math.round(((Player)model).getVolume()*100) );
         }
         // Initialisation de l'application
         else if( argument.equals("initialization") ) {
-            this.viewPlaylist.setPlaylist(sdm.getPlaylist());
-            Music current = sdm.getCurrentMusic();
+            this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
+            Music current = ((SplayerDataManager)model).getCurrentMusic();
             if( current != null ) {
                 this.viewMain.updateData(current);
             }
         }
+    }
+    
+    public void updateTimer(int timeInMilliSec)
+    {
+        int timeInSec = (int) (timeInMilliSec/1000);
+        viewMain.setDisplay("time", (int)Math.floor(timeInSec/60) + ":" + String.format("%02d", timeInSec%60));
+        viewMain.setSlider(timeInMilliSec);
     }
 
     /* Interface stage */
@@ -66,9 +86,19 @@ public class SplayerViewManager implements Observer {
     public void setListener(String componentName, Object listener)
     {   
         // Listener pour la playlist
-        if( componentName.equals("PLAYLIST") )
-            if( listener instanceof MouseListener )
+        if( listener instanceof MouseListener ) {
+            if( componentName.equals("PLAYLIST") )
                 viewPlaylist.setPlaylistListener(listener);
+        }
+        // Listener pour le slider de volume
+        else if( listener instanceof  SplayerVolumeListener )
+            viewMain.addVolumeListener((ChangeListener) listener);
+        // Listener pour le slider de lecture
+        else if( listener instanceof SplayerSliderListener )
+            viewMain.addSliderListener(listener);
+        // Listener de fenêtre principale
+        else if( listener instanceof SplayerWindowListener )
+            viewMain.addWindowListener((WindowListener)listener);
     }
     
     public void setPlaylistHandler(TransferHandler handler)

@@ -1,4 +1,4 @@
-package engine.action;
+package engine.listener;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -7,11 +7,11 @@ import javax.swing.JList;
 
 import engine.SplayerEngine;
 
-public class ActionMouse extends MouseAdapter
+public class SplayerMouseListener extends MouseAdapter
 {
     private SplayerEngine engine;
     
-    public ActionMouse(SplayerEngine engine)
+    public SplayerMouseListener(SplayerEngine engine)
     {
         this.engine = engine;
     }

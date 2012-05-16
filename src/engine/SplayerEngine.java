@@ -5,7 +5,13 @@ import java.awt.event.MouseListener;
 import view.SplayerViewManager;
 import data.MusicHandler;
 import data.SplayerDataManager;
-import engine.action.*;
+import engine.action.ActionNextMusic;
+import engine.action.ActionPlay;
+import engine.action.ActionPreviousMusic;
+import engine.listener.SplayerMouseListener;
+import engine.listener.SplayerSliderListener;
+import engine.listener.SplayerVolumeListener;
+import engine.listener.SplayerWindowListener;
 
 public class SplayerEngine {
 
@@ -27,16 +33,23 @@ public class SplayerEngine {
         
         // MVC is magic !
         this.sdm.addObserver(this.svm);
+        this.player.addObserver(this.svm);
         this.sdm.notifyObservers("initialization");
         
-        // Action mapping
-        actionMouse = new ActionMouse(this);
+        // Listener mapping
+        actionMouse = new SplayerMouseListener(this);
         this.svm.setListener("PLAYLIST", actionMouse);
+        this.svm.setListener("WINDOW", new SplayerWindowListener(this));
+        this.svm.setListener("VOLUME", new SplayerVolumeListener(this));
+        this.svm.setListener("PLAYER", new SplayerSliderListener(this));
+        
+        // Action mapping
         this.svm.setAction("play", new ActionPlay(this));
         this.svm.setAction("next", new ActionNextMusic(this));
         this.svm.setAction("previous", new ActionPreviousMusic(this));
         this.svm.setPlaylistHandler(new MusicHandler(this.sdm));
         
+        // Post-init messages
         System.out.println("Splayer:Engine initialized.");
         System.out.println("Splayer:Ready to launch !");
     }
@@ -58,6 +71,14 @@ public class SplayerEngine {
         if( player.getPlayerState() == Player.STOP )
             player.setPath(sdm.getCurrentMusicPath());
         player.PlayPause();
+    }
+    
+    /**
+     * Arrête la musique en cours de lecture.
+     */
+    public void stop()
+    {
+        player.Stop();
     }
     
     /**
@@ -83,5 +104,23 @@ public class SplayerEngine {
     public void playThisMusic(int playlistIndex)
     {
         player.setPath( sdm.selectMusic(playlistIndex) );
+    }
+
+    /**
+     * Modifie le volume
+     * @param value valeur du volume de 0 à 100 (0 étant le son coupé)
+     */
+    public void setVolume(int value)
+    {
+        player.setVolume( (float) (value/100.0) );
+    }
+
+    /**
+     * Déplace la tête de lecture à la position indiquée en seconde
+     * @param value position en milliseconde
+     */
+    public void moveReadHead(int positionInMilliSec)
+    {
+        player.setPosition(positionInMilliSec);
     }
 }

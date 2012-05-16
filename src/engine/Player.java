@@ -1,10 +1,12 @@
 package engine;
 
+import java.util.Observable;
+
 import javazoom.jl.decoder.Equalizer;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.LillePlayer;
 
-public class Player {
+public class Player extends Observable {
     
     /* Enum stage */
     public final static int STOP = 0;
@@ -12,21 +14,23 @@ public class Player {
     public final static int PLAY = 2;
     
     /* Data stage */
+    private final static int clockrate = 200; 
+            
     private LillePlayer player;
     private String currentPath;
     
     private int state;
-    private float volume = 1;
+    private float volume = (float) 0.2;
     private int position = 0;
 
     /* Builder stage */
     public Player()
     {
-        this.player = null;
-        this.currentPath = "";
-        this.state = STOP;
+        this.player         = null;
+        this.currentPath    = "";
+        this.state          = STOP;
     }
-    
+
     /* Player stage */
     public void Load(String path){
         if(state != STOP)
@@ -37,7 +41,7 @@ public class Player {
             if( path != null )
             {
                 player = new LillePlayer(currentPath);
-                player.setVolume(volume);
+                player.setVolume(10);
                 Equalizer eq = new Equalizer();
                 eq.getBand(0);
             }
@@ -103,9 +107,13 @@ public class Player {
         return volume;
     }
     
+    // TODO Apparemment c'est en valeur logarithmique ! Conversion nécessaire pour être user-friendly
     public void setVolume(float level){
         volume = level;
-        player.setVolume(level);
+        if( player != null)
+            player.setVolume(level);
+        setChanged();
+        notifyObservers("volumeUpdate");
     }
     
     public int getDuration(){
@@ -134,7 +142,7 @@ public class Player {
         }
         public void run(){
             try{            
-                System.out.println("LaunchEvent");
+                //System.out.println("LaunchEvent");
                 PlayThread pt = new PlayThread();
                 pt.start();
                 
@@ -143,7 +151,9 @@ public class Player {
                     if(player == playerInterne)
                         //System.out.println("PositionEvent");
                     try{
-                        Thread.sleep(200);
+                        Thread.sleep(clockrate);
+                        setChanged();
+                        notifyObservers("timerUpdate");
                     }catch(Exception e){ e.printStackTrace(); }
                 }
                 
