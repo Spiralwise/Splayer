@@ -1,9 +1,11 @@
 package engine;
 
+import java.awt.event.MouseListener;
+
 import view.SplayerViewManager;
 import data.MusicHandler;
 import data.SplayerDataManager;
-import engine.action.ActionPlay;
+import engine.action.*;
 
 public class SplayerEngine {
 
@@ -11,6 +13,9 @@ public class SplayerEngine {
     private Player player;
     private SplayerDataManager sdm;
     private SplayerViewManager svm;
+    
+    /* Action stage */
+    private MouseListener actionMouse;
     
     /* Builder stage */
     public SplayerEngine(SplayerDataManager sdm, SplayerViewManager svm)
@@ -22,14 +27,18 @@ public class SplayerEngine {
         
         // MVC is magic !
         this.sdm.addObserver(this.svm);
-        this.sdm.notifyObservers();
+        this.sdm.notifyObservers("initialization");
         
         // Action mapping
+        actionMouse = new ActionMouse(this);
+        this.svm.setListener("PLAYLIST", actionMouse);
         this.svm.setAction("play", new ActionPlay(this));
+        this.svm.setAction("next", new ActionNextMusic(this));
+        this.svm.setAction("previous", new ActionPreviousMusic(this));
         this.svm.setPlaylistHandler(new MusicHandler(this.sdm));
         
-        System.out.println("SplayerEngine initialized.");
-        System.out.println("Splayer ready to launch !");
+        System.out.println("Splayer:Engine initialized.");
+        System.out.println("Splayer:Ready to launch !");
     }
     
     /* SPlayer stage */
@@ -65,5 +74,14 @@ public class SplayerEngine {
     public void previousMusic()
     {
         player.setPath( sdm.nextMusic(false) );
+    }
+    
+    /**
+     * Joue la musique se trouvant ˆ l'index correspondant.
+     * @param playlistIndex index de playlist de la musique ˆ jouer
+     */
+    public void playThisMusic(int playlistIndex)
+    {
+        player.setPath( sdm.selectMusic(playlistIndex) );
     }
 }

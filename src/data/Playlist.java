@@ -12,7 +12,7 @@ public class Playlist {
     /* Builder stage */
     public Playlist()
     {
-        this.index = 0;
+        this.index = -1; // -1 = Aucune musique en cours
         this.list = new DefaultListModel();
         // TODO GŽrer le cas o on envoie une liste de la bibliothque
     }
@@ -50,7 +50,7 @@ public class Playlist {
         else
             index --;
         
-        if( index > list.getSize() )
+        if( index >= list.getSize() )
             index = 0;
         else if( index < 0 )
             index = list.getSize() - 1;
@@ -63,14 +63,42 @@ public class Playlist {
     public void add(Music music)
     {
         list.addElement(music);
+        // Si on charge la premire musique, on place l'index sur celle-ci.
+        if( index == -1 ) index = 0;
+    }
+    
+    /**
+     * Retourne l'objet musique en cours de lecture.
+     * @return l'objet musique en cours de lecture
+     */
+    public Music getCurrentMusic()
+    {
+        if( index != -1 )
+            return (Music)list.getElementAt(index);
+        else
+            return null;
     }
     
     /**
      * Retourne le path de la musique en cours.
-     * @return
+     * @return null si l'index ne correspond ˆ aucune musique
      */
-    public String getCurrentMusic()
+    public String getCurrentMusicPath()
     {
+        if( index == -1 )
+            return null;
         return ((Music)list.getElementAt(index)).getPath();
+    }
+
+    /**
+     * SŽlectionne une musique dans la playlist.
+     * @param playlistIndex index de playlist de la musique ˆ jouer
+     * @return path de la musique sŽlectionnŽe, null si l'index ne correspond ˆ aucune musique
+     */
+    public void selectMusic(int playlistIndex)
+    {
+        if( playlistIndex < 0 || playlistIndex >= list.getSize() )
+            index = -1;
+        index = playlistIndex;
     }
 }

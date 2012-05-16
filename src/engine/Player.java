@@ -34,10 +34,15 @@ public class Player {
         
         try{
             currentPath = path;
-            player = new LillePlayer(currentPath);
-            player.setVolume(volume);
-            Equalizer eq = new Equalizer();
-            eq.getBand(0);
+            if( path != null )
+            {
+                player = new LillePlayer(currentPath);
+                player.setVolume(volume);
+                Equalizer eq = new Equalizer();
+                eq.getBand(0);
+            }
+            else
+                currentPath = "";
             state = LOAD;
         }
         catch(Exception e){
@@ -64,6 +69,14 @@ public class Player {
         }
     }
     
+    /**
+     * Relance une musique.
+     */
+    public void Play() {
+        Load(currentPath);
+        PlayPause();
+    }
+    
     public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrête la musique.
         if(state == LOAD || state == PLAY){
             player.close();
@@ -73,10 +86,13 @@ public class Player {
     
     /**
      * Modifie le path de la musique à jouer.
+     * Si la musique est en cours de lecture, il passe à celle-ci.
      * @param path
      */
     public void setPath(String path) {
         currentPath = path;
+        if( state == PLAY )
+            Play();
     }
     
     public int getPlayerState() {

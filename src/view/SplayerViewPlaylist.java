@@ -2,9 +2,11 @@ package view;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -27,6 +29,8 @@ public class SplayerViewPlaylist extends JFrame {
     // Interactive components
     private JList playlist;
     private JList library;
+    
+    private JButton fakeButton;
 
     public SplayerViewPlaylist()
     {
@@ -60,6 +64,11 @@ public class SplayerViewPlaylist extends JFrame {
     public void setPlaylistHandler(TransferHandler handler)
     {
         playlist.setTransferHandler(handler);
+    }
+    
+    public void setPlaylistListener(Object listener)
+    {
+        playlist.addMouseListener((MouseListener)listener);
     }
     
     /* Implementation stage */
