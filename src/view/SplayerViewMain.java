@@ -166,9 +166,17 @@ public class SplayerViewMain extends JFrame {
      */
     public void setSlider(int timeInMilliSec)
     {
-        //sliderPlayer.setValueIsAdjusting(false); // Evite au slider d'envoyer un faux-positif de notification de changement
         sliderPlayer.setValue(timeInMilliSec);
-        //sliderPlayer.setValueIsAdjusting(true);
+    }
+    
+    /**
+     * Modifie la position du slider de volume.
+     *  /!\ Attention, cette méthode est réservée pour l'update induit par le player.
+     * @param value
+     */
+    public void setvolume(int value)
+    {
+        sliderVolume.setValue(value);
     }
     
     /**

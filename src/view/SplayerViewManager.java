@@ -68,6 +68,11 @@ public class SplayerViewManager implements Observer {
                 this.viewMain.updateData(current);
             }
         }
+        // Initialisation du player
+        else if( argument.equals("playerInit") ) {
+            this.viewMain.setDisplay("volume", "" + Math.round(((Player)model).getVolume()*100) );
+            this.viewMain.setvolume( (int) (((Player)model).getVolume() * 100) );
+        }
     }
     
     public void updateTimer(int timeInMilliSec)

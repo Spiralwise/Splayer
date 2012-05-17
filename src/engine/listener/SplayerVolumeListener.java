@@ -18,7 +18,8 @@ public class SplayerVolumeListener implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent event)
     {
-        engine.setVolume( (int)((JSlider)event.getSource()).getValue() );
+        if( ((JSlider)event.getSource()).getValueIsAdjusting() )
+            engine.setVolume( (int)((JSlider)event.getSource()).getValue() );
     }
 
 }

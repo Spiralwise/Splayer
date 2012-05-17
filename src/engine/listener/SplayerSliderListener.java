@@ -12,14 +12,13 @@ public class SplayerSliderListener implements ChangeListener {
     
     public SplayerSliderListener(SplayerEngine engine)
     {
-        System.out.println("Create Slider Listener");
         this.engine = engine;
     }
     
     @Override
     public void stateChanged(ChangeEvent event)
     {
-        if( ((JSlider)event.getSource()).getValueIsAdjusting() )
+        if( ((JSlider)event.getSource()).getValueIsAdjusting() ) // Empêche de rappeler le listener récursivement (puisque c'est un changement d'état)
             engine.moveReadHead( (int) ((JSlider)event.getSource()).getValue() );
     }
 

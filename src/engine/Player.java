@@ -20,7 +20,7 @@ public class Player extends Observable {
     private String currentPath;
     
     private int state;
-    private float volume = (float) 0.2;
+    private float volume = (float) 0.4;
     private int position = 0;
 
     /* Builder stage */
@@ -29,6 +29,7 @@ public class Player extends Observable {
         this.player         = null;
         this.currentPath    = "";
         this.state          = STOP;
+        this.setChanged();
     }
 
     /* Player stage */

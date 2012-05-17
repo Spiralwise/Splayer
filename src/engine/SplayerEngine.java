@@ -35,6 +35,7 @@ public class SplayerEngine {
         this.sdm.addObserver(this.svm);
         this.player.addObserver(this.svm);
         this.sdm.notifyObservers("initialization");
+        this.player.notifyObservers("playerInit");
         
         // Listener mapping
         actionMouse = new SplayerMouseListener(this);
