@@ -1,16 +1,12 @@
 package data;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Observable;
 
 import javax.swing.DefaultListModel;
 
-import org.farng.mp3.TagException;
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.UnsupportedTagException;
 
 public class SplayerDataManager extends Observable {
     
@@ -24,14 +20,20 @@ public class SplayerDataManager extends Observable {
         this.playlist = new Playlist();
         this.librairy = new Library();
         System.out.println("SplayerDataManager initialized.");
-        try {
-            playlist.add(new Music("./data/music/Runaway.mp3"));
+         try {
+			playlist.add(new Music("./data/music/Runaway.mp3"));
         } catch (IOException e) {
+            System.err.println("Splayer:DataManager: Can't open file.");
             e.printStackTrace();
-        } catch (TagException e) {
-			e.printStackTrace();
-		}
+        } catch (UnsupportedTagException e) {
+            System.err.println("Splayer:DataManager: Unknown tag.");
+            e.printStackTrace();
+        } catch (InvalidDataException e) {
+            System.err.println("Splayer:DataManager: Invalid data.");
+            e.printStackTrace();
+        }
         this.setChanged();
+        System.out.println("Splayer:DataManager initialized.");
     }
     
     /* Implementation stage */
@@ -51,7 +53,7 @@ public class SplayerDataManager extends Observable {
     {
         playlist.add(music);
         setChanged();
-        notifyObservers();
+        notifyObservers("playlistUpdate");
     }
     
     /**
@@ -65,9 +67,18 @@ public class SplayerDataManager extends Observable {
 
     /**
      * Renvoie le path de la musique en cours de lecture à charger.
-     * @return path de la musique en cours
+     * @return path de la musique en cours, null si l'index ne correspond à aucune musique en cours
      */
     public String getCurrentMusicPath()
+    {
+        return playlist.getCurrentMusicPath();
+    }
+    
+    /**
+     * Retourne l'objet musique en cours de lecture.
+     * @return l'objet musique en cours de lecture, null si l'index ne pointe sur aucune musique
+     */
+    public Music getCurrentMusic()
     {
         return playlist.getCurrentMusic();
     }
@@ -80,6 +91,21 @@ public class SplayerDataManager extends Observable {
     public String nextMusic(boolean forward)
     {
         playlist.moveIndex(forward);
-        return playlist.getCurrentMusic();
+        setChanged();
+        notifyObservers("playlistSelection");
+        return playlist.getCurrentMusicPath();
+    }
+
+    /**
+     * Sélectionne une musique dans la playlist.
+     * @param playlistIndex index de playlist de la musique à jouer
+     * @return path de la musique sélectionnée, null si l'index ne correspond à aucune musique
+     */
+    public String selectMusic(int playlistIndex)
+    {
+        playlist.selectMusic(playlistIndex);
+        setChanged();
+        notifyObservers("playlistSelection");
+        return playlist.getCurrentMusicPath();
     }
 }

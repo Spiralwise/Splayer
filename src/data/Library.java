@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -21,16 +22,14 @@ public class Library extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
     // Les entetes du tableau
-//	private final String[] entetes = {"Titre", "Artiste", "Album", "Annee", "Genre", "Duree"};
-	private final String[] entetes = {"Titre"};
-//  private final List<Music> musiques = new ArrayList<Music>();
-    private final List<String> musiques = new ArrayList<String>();
+	private final String[] entetes = {"Titre", "Artiste", "Album", "Annee", "Genre", "Duree"};
+	private final List<Music> musiques = new ArrayList<Music>();
 
     
     public Library() {
         super();
-			musiques.add("Runaway");
-	        musiques.add("Wake up");
+			musiques.add(new Music("Ms. Hospital Corners","The Envy Corps","It Cults You",2011,"Rock",310000));
+			musiques.add(new Music("Ya Mama","Fatboy Slim","Halfway Between The Gutter And The Stars",2000,"Electro",338000));
 		try {
 			this.connectLibrary("./data/mp3database.sqlite");
 		} catch (ClassNotFoundException e) {
@@ -42,7 +41,7 @@ public class Library extends AbstractTableModel {
 		}
     }
 
-    public void connectLibrary(String path) throws ClassNotFoundException, IOException, TagException{
+    public void connectLibrary(String path) throws ClassNotFoundException, IOException, TagException,NumberFormatException{
     	// load the sqlite-JDBC driver using the current class loader
     	Class.forName("org.sqlite.JDBC");
     	Connection connection = null;
@@ -63,13 +62,13 @@ public class Library extends AbstractTableModel {
 //    			i++;
 
     			// transfere les donnees dans le tableau
-    			this.musiques.add(rs.getString("title"));
-//    			rs.getString("title");
-//    			rs.getString("artist");
-//    			rs.getString("album");
-//    			rs.getString("year");
-//    			rs.getString("genre");
-//    			rs.getString("duration");
+    			this.musiques.add(new Music(
+    					rs.getString("title"),
+		    			rs.getString("artist"),
+		    			rs.getString("album"),
+		    			Integer.valueOf(rs.getString("year")),
+		    			rs.getString("genre"),
+		    			Integer.valueOf(MntoMs(rs.getString("duration")))));
     		}
     	}
     	catch(SQLException e)
@@ -97,7 +96,7 @@ public class Library extends AbstractTableModel {
 //    	this.musiques.add(music);
 //    }
     
-    public void addSong(String music){
+    public void addSong(Music music){
     	this.musiques.add(music);
     }
     /**
@@ -122,34 +121,36 @@ public class Library extends AbstractTableModel {
         return entetes[columnIndex];
     }
 
-
-	@Override
-	public Object getValueAt(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
     /**
      * @return l'élément du tableau à l'intersection ligne colonne spécifiee
      * @param rowIndex l'index de ligne
      * @param columnIndex l'index de colonne
      */
-//    public Object getValueAt(int rowIndex, int columnIndex) {
-//        switch(columnIndex){
-//            case 0:
-//                return musiques.get(rowIndex).getTitle();
-//            case 1:
-//                return musiques.get(rowIndex).getArtist();
-//            case 2:
-//                return musiques.get(rowIndex).getAlbum();
-//            case 3:
-//                return musiques.get(rowIndex).GetYear();
-//            case 4:
-//                return musiques.get(rowIndex).GetGenre();
-//            case 5:
-//                return musiques.get(rowIndex).getDuration();
-//            default:
-//                return null; //Ne devrait jamais arriver
-//        }
-//    }
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        switch(columnIndex){
+            case 0:
+                return musiques.get(rowIndex).getTitle();
+            case 1:
+                return musiques.get(rowIndex).getAuthor();
+            case 2:
+                return musiques.get(rowIndex).getAlbum();
+            case 3:
+                return musiques.get(rowIndex).getYear();
+            case 4:
+                return musiques.get(rowIndex).getGenre();
+            case 5:
+                return musiques.get(rowIndex).getDuration();
+            default:
+                return null; //Ne devrait jamais arriver
+        }
+    }
+    
+    public int MntoMs(String value){
+    	StringTokenizer token = new StringTokenizer(value,":");
+    	int minutes = Integer.valueOf(token.nextToken());
+//    	System.out.println("les minutes "+minutes);
+    	int secondes = Integer.valueOf(token.nextToken());
+//    	System.out.println("les secondes "+secondes);
+    	return (minutes*60+secondes)*1000;
+    }
 }

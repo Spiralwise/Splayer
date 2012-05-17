@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 
+import data.Music;
+
 /**
  * Classe representant la fenetre principale
  * @author Sebastien Poulmane & Loic Daara
@@ -47,10 +49,10 @@ public class SplayerViewMain extends JFrame {
         // Components
         display = new HashMap<String, JLabel>();
         display.put("time", new JLabel("0:00"));
-        display.put("left", new JLabel("99:99"));
-        display.put("artist", new JLabel("John Doe"));
-        display.put("title", new JLabel("Soft Kitty"));
-        display.put("album", new JLabel("Sweet Songs When Being Sick"));
+        display.put("left", new JLabel("59:59"));
+        display.put("artist", new JLabel("---"));
+        display.put("title", new JLabel("---"));
+        display.put("album", new JLabel("---"));
 
         // TODO Cree des icones et si possible des boutons non-rectangulaires (LoÔc: Ckecker et supprimer)
         buttonPlayer = new HashMap<String, JButton>();
@@ -74,7 +76,7 @@ public class SplayerViewMain extends JFrame {
         
         // TODO Trouver un meilleur emplacement
         //buttonPlayer.put("PLAYLIST", new JButton("Playlist"));
-        buttonPlayer.put("PLAYLIST", new JButton(new ImageIcon("./data/icon/media-search.png")));
+        buttonPlayer.put("playlist", new JButton(new ImageIcon("./data/icon/media-search.png")));
         
         sliderPlayer = new JSlider(0, 100, 0);
         sliderVolume = new JSlider(0, 100, 25);
@@ -118,7 +120,7 @@ public class SplayerViewMain extends JFrame {
         controlerPanel.add(buttonPlayer.get("forward"));
         controlerPanel.add(buttonPlayer.get("next"));
         controlerPanel.add(buttonPlayer.get("random"));
-        controlerPanel.add(buttonPlayer.get("PLAYLIST"));
+        controlerPanel.add(buttonPlayer.get("playlist"));
         
 //        for (String mapKey : buttonPlayer.keySet()) {
 //        	 controlerPanel.add(buttonPlayer.get(mapKey));
@@ -148,8 +150,36 @@ public class SplayerViewMain extends JFrame {
     }
     
     /* Action stage */
+    /**
+     * Modifie le texte d'un élément du lecteur.
+     * @param labelName code label à modifier (ex: "title" pour modifier le titre)
+     * @param message
+     */
+    public void setDisplay(String labelName, String message)
+    {
+        display.get(labelName).setText(message);
+    }
+    
+    /**
+     * Assopcie un bouton avec une action. Attention, ceci pourrait être modifié si tous les boutons sont gérés par le SplayerViewManager.
+     * @param buttonName code bouton à associer (ex: "play" pour le bouton de lecture/pause)
+     * @param action AbstractAction à associer
+     */
     public void setAction(String buttonName, AbstractAction action)
     {
         buttonPlayer.get(buttonName).setAction(action);
+    }
+
+    /* Implementation stage */
+    /**
+     * Met à jour les données du lecteur selon la musique passé en paramètre.
+     * @param current musique dont les données sont à afficher dans le lecteur
+     */
+    public void updateData(Music current)
+    {
+        // TODO Regler le problème des caractères invisibles
+        setDisplay("artist", current.getAuthor());
+        setDisplay("title", current.getTitle());
+        setDisplay("album", current.getAlbum());
     }
 }

@@ -3,7 +3,7 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.io.IOException;
+import java.awt.event.MouseListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
@@ -14,8 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
-
-import org.farng.mp3.TagException;
 
 import data.Library;
 
@@ -72,6 +70,11 @@ public class SplayerViewPlaylist extends JFrame {
     public void setPlaylistHandler(TransferHandler handler)
     {
         playlist.setTransferHandler(handler);
+    }
+    
+    public void setPlaylistListener(Object listener)
+    {
+        playlist.addMouseListener((MouseListener)listener);
     }
     
     /* Implementation stage */
