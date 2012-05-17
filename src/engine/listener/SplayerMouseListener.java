@@ -18,6 +18,12 @@ public class SplayerMouseListener extends MouseAdapter
     
     public void mouseClicked(MouseEvent event)
     {
+        // Simple clic ...
+        if( event.getClickCount() == 1) {
+            // .. sur une JList (normalement, la playlist)
+            if( event.getSource() instanceof JList )
+                engine.setSelectedMusic( ((JList)event.getSource()).getSelectedIndex() );
+        }
         // Double-clic ...
         if( event.getClickCount() == 2 ) {
             // ... sur une JList (normalement, la playlist)

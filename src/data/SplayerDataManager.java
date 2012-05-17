@@ -5,7 +5,6 @@ import java.util.Observable;
 
 import javax.swing.DefaultListModel;
 
-
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
@@ -13,15 +12,22 @@ public class SplayerDataManager extends Observable {
     
     /* Data stage */
     private Playlist playlist;
+    private Library library;
     
     /* Builder stage */
     public SplayerDataManager()
     {
+        // Data initialization
         this.playlist = new Playlist();
-        try {
-            playlist.add(new Music("./data/music/01 Act On Instinct.mp3"));
-            playlist.add(new Music("./data/music/01 Hell March.mp3"));
-            playlist.add(new Music("./data/music/13 School.Mp3"));
+        this.library = new Library();
+        
+        // Loading music samples
+         try {
+			playlist.add(new Music("./data/music/01 Act On Instinct.mp3"));
+			playlist.add(new Music("./data/music/01 Hell March.mp3"));
+			playlist.add(new Music("./data/music/13 School.mp3"));
+			playlist.add(new Music("./data/music/Sonic 3 - Hydrocity Zone Act 2 [Pitched Up].mp3"));
+			playlist.add(new Music("./data/music/01 Head Like A Hole.mp3"));
         } catch (IOException e) {
             System.err.println("Splayer:DataManager: Can't open file.");
             e.printStackTrace();
@@ -32,13 +38,25 @@ public class SplayerDataManager extends Observable {
             System.err.println("Splayer:DataManager: Invalid data.");
             e.printStackTrace();
         }
+         
+        // Force init update
         this.setChanged();
+        
+        // Post-init messages
         System.out.println("Splayer:DataManager initialized.");
     }
     
     /* Implementation stage */
+    
     /**
-     * Ajoute une musique à la suite de la playlist courrante.
+     * Connecte la librairie ‡ la base sql
+     * @throws TagException 
+     * @throws IOException 
+     */
+    // TODO Pas de code ? Vérifier que ça existait déjà. Sinon implémenter
+
+    /**
+     * Ajoute une musique a la suite de la playlist courrante.
      * @param music
      */
     public void addToPlaylist(Music music)
@@ -99,5 +117,25 @@ public class SplayerDataManager extends Observable {
         setChanged();
         notifyObservers("playlistSelection");
         return playlist.getCurrentMusicPath();
+    }
+    
+    /**
+     * Déplace une musique dans la playlist.
+     * @param selectedindex index de la musique à déplacer
+     * @param insertindex index de destination, la musique qui s'y trouvait se placera juste en dessous
+     */
+    public void moveMusic(int selectedindex, int insertindex)
+    {
+        playlist.move(selectedindex, insertindex);
+    }
+    
+    public void removeMusic(int removeindex)
+    {
+        playlist.remove(removeindex);
+    }
+
+    public void shufflePlaylist()
+    {
+        playlist.shuffle();
     }
 }

@@ -23,12 +23,14 @@ import com.mpatric.mp3agic.UnsupportedTagException;
  */
 public class Music extends Mp3File {
 
-    // Données formatées pour un usage facilité avec Splayer
+    // Donnees formatees pour un usage facilite avec Splayer
     private String url;
     private String splayerAuthor;
     private String splayerTitle;
     private String splayerAlbum;
-    private int duration; // En ms
+    private String splayerGenre;
+    private int splayerDuration; // En ms
+    private int splayerYear;
     
     /**
      * Constructeur principal
@@ -37,6 +39,7 @@ public class Music extends Mp3File {
      * @throws InvalidDataException 
      * @throws UnsupportedTagException 
      */
+    @SuppressWarnings("rawtypes")
     public Music(String filename) throws IOException, UnsupportedTagException, InvalidDataException
     {
         super(filename);
@@ -74,12 +77,36 @@ public class Music extends Mp3File {
         try {
             AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(new File(filename));
             Map properties = baseFileFormat.properties();
-            duration = (int) ( ((Long)properties.get("duration")).intValue() / 1000 );
+            splayerDuration = (int) ( ((Long)properties.get("duration")).intValue() / 1000 );
             //duration = (int) ( frames / format.getFrameRate() * 1000 );
         } catch (UnsupportedAudioFileException e) {
-            duration = 0;
+            splayerDuration = 0;
             e.printStackTrace();
         }
+        
+        // Nettoyage des informations nulls
+        if( this.splayerAuthor == null ) this.splayerAuthor = "Auteur inconnu";
+        if( this.splayerTitle == null ) this.splayerTitle = "Titre inconnu";
+        if( this.splayerAlbum == null ) this.splayerAlbum = "Album inconnu";
+    }
+    
+    /**
+     * 
+     * @param Title 	titre de la chanson
+     * @param Artist 	nom du groupe ou de l'artiste
+     * @param Album 	titre de l'album
+     * @param Year		annÈe de sortie
+     * @param Genre		style musical
+     * @param Duration 	duree en ms
+     */
+    public Music(String Title, String Artist,String Album, int Year,String Genre, int Duration ){
+        url="";
+        splayerAuthor 	= Artist;
+        splayerTitle  	= Title;
+        splayerAlbum  	= Album;
+        splayerGenre 	= Genre;
+        splayerDuration	= Duration;
+        splayerYear		= Year;
     }
     
     /* Getter stage */
@@ -98,13 +125,23 @@ public class Music extends Mp3File {
         return splayerAlbum;
     }
     
+    public String getGenre()
+    {
+        return splayerGenre;
+    }
+    
+    public int getYear()
+    {
+        return splayerYear;
+    }
+
     /**
      * Durée en milliseconde
      * @return
      */
     public int getDuration()
     {
-        return duration;
+        return splayerDuration;
     }
     
     /**
@@ -113,7 +150,7 @@ public class Music extends Mp3File {
      */
     public int getDurationInSec()
     {
-        return (int) (duration/1000);
+        return (int) (splayerDuration/1000);
     }
     
     /**
@@ -128,6 +165,6 @@ public class Music extends Mp3File {
 
     public String toString()
     {
-        return this.getId3v2Tag().getTitle();
+        return splayerAuthor + " - " + splayerTitle;
     }
 }

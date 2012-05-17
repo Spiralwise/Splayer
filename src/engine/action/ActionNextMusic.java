@@ -3,6 +3,7 @@ package engine.action;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 import engine.SplayerEngine;
 
@@ -13,6 +14,7 @@ public class ActionNextMusic extends AbstractAction {
     
     public ActionNextMusic(SplayerEngine engine)
     {
+        super("", new ImageIcon("./data/icon/media-next.png"));
         this.engine = engine;
     }
     

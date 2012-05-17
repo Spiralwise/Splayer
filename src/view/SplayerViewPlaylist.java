@@ -3,34 +3,41 @@ package view;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
 
+import data.Library;
+
 /**
- * Classe représentant la bibliothèque et la playlist.
- * @author Sébastien Poulmane & Loïc Daara
+ * Classe representant la bibliotheque et la playlist.
+ * @author Sebastien Poulmane & Loic Daara
  *
  */
 @SuppressWarnings("serial")
 public class SplayerViewPlaylist extends JFrame {
         
-    /* Interface stage */
-    // Panels
-    private JPanel panel;
-    private JScrollPane scrollPlaylist; // Nécessaire pour rendre une liste visible
-    // Interactive components
-    private JList playlist;
-    private JList library;
-    
-    private JButton fakeButton;
+	/* Interface stage */
+	// Panels
+	private JPanel panel;
+	private JPanel playlistPanel, libraryPanel;
+	private JScrollPane scrollPlaylist; // Necessaire pour rendre une liste visible
+	// Interactive components
+    private HashMap<String, JButton> buttonPlaylist; // TODO Les bouttons sont des actions et pour bien dÈcouper le code, il faudrait qu'ils se trouvent dans le SVM.
+        // TODO Si à terme il ne reste que un ou deux boutons, autant ne pas faire de hashmap. Sauf si on fusionne tous les boutons dans le ViewManager.
+	private JList playlist;
+	private JTable bibliotheque;
 
     public SplayerViewPlaylist()
     {
@@ -39,21 +46,47 @@ public class SplayerViewPlaylist extends JFrame {
         panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        
+
         // Components
+            // Buttons
+        buttonPlaylist = new HashMap<String, JButton>();
+        buttonPlaylist.put("removeItem", new JButton());
+        buttonPlaylist.put("shuffle", new JButton());
+
+            // Playlist
         playlist = new JList();
-        library = new JList();
-        
         playlist.setDragEnabled(true);
         playlist.setDropMode(DropMode.INSERT);
         scrollPlaylist = new JScrollPane(playlist);
         
+            // Library
+        bibliotheque = new JTable(new Library()); // TODO From Seb : Attention !!! La bibliothèque doit être créer par la DataManager !
+        
         // Layout
         GridBagConstraints layoutManager = new GridBagConstraints();
+        layoutManager.fill = GridBagConstraints.BOTH;
         
+            // Playlist panel
+        playlistPanel = new JPanel(new GridBagLayout()); // TODO Il faurait aussi qu'on puisse afficher le temps.
+        layoutManager.gridwidth = 4;
+        playlistPanel.add(scrollPlaylist, layoutManager);
+        layoutManager.gridx = 0;
+        layoutManager.gridy = 1;
+        layoutManager.gridwidth = 1;
+        playlistPanel.add(buttonPlaylist.get("shuffle"), layoutManager);
+        layoutManager.gridx = 3;
+        playlistPanel.add(buttonPlaylist.get("removeItem"), layoutManager);
+        
+            // Library panel
+        libraryPanel = new JPanel();
+		libraryPanel.add(new JScrollPane(bibliotheque));
+        
+            // Layout building
         layoutManager.gridx = layoutManager.gridy = 0;
-        panel.add(scrollPlaylist, layoutManager);
-        
+        panel.add(playlistPanel, layoutManager);
+        layoutManager.gridx = 2;
+        panel.add(libraryPanel, layoutManager);
+
         // Packing
         this.add(panel);
         this.pack();
@@ -61,6 +94,17 @@ public class SplayerViewPlaylist extends JFrame {
     }
     
     /* Interface stage */
+    /**
+     * Assopcie un bouton avec une action. Attention, ceci pourrait être modifié si tous les boutons sont gérés par le SplayerViewManager.
+     * @param buttonName code bouton à associer (ex: "play" pour le bouton de lecture/pause)
+     * @param action AbstractAction à associer
+     */
+    public void setAction(String buttonName, AbstractAction action)
+    {
+        if( buttonPlaylist.containsKey(buttonName) )
+            buttonPlaylist.get(buttonName).setAction(action);
+    }
+    
     public void setPlaylistHandler(TransferHandler handler)
     {
         playlist.setTransferHandler(handler);
@@ -73,7 +117,7 @@ public class SplayerViewPlaylist extends JFrame {
     
     /* Implementation stage */
     /**
-     * Spécifie / Met à jour la playlist.
+     * Specifie / Met a jour la playlist.
      * @param list
      */
     public void setPlaylist(DefaultListModel list)

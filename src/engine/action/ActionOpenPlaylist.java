@@ -3,6 +3,7 @@ package engine.action;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 import view.SplayerViewPlaylist;
 
@@ -13,6 +14,7 @@ public class ActionOpenPlaylist extends AbstractAction {
     
     public ActionOpenPlaylist(SplayerViewPlaylist view)
     {
+        super("", new ImageIcon("./data/icon/media-search.png"));
         this.view = view;
     }
     

@@ -32,8 +32,9 @@ public class SplayerViewManager implements Observer {
         this.viewPlaylist   = new SplayerViewPlaylist();
         
         // Action mapping
-        //this.viewMain.setAction("play", new ActionPlay());
         this.viewMain.setAction("playlist", new ActionOpenPlaylist(viewPlaylist));
+        
+        // Post-init messages
         System.out.println("Splayer:ViewManager initialized.");
     }
 
@@ -83,9 +84,15 @@ public class SplayerViewManager implements Observer {
     }
 
     /* Interface stage */
+    /**
+     * Assopcie un bouton avec une action. Attention, ceci pourrait être modifié si tous les boutons sont gérés par le SplayerViewManager.
+     * @param buttonName code bouton à associer (ex: "play" pour le bouton de lecture/pause)
+     * @param action AbstractAction à associer
+     */
     public void setAction(String buttonName, AbstractAction action)
     {
         viewMain.setAction(buttonName, action);
+        viewPlaylist.setAction(buttonName, action);
     }
     
     public void setListener(String componentName, Object listener)

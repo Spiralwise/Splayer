@@ -3,7 +3,6 @@ package view;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.WindowListener;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
@@ -45,6 +44,7 @@ public class SplayerViewMain extends JFrame {
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));	// Leaves a transparent margin without any associated drawing.
 
         // Components
+            // Display
         display = new HashMap<String, JLabel>();
         display.put("volume", new JLabel("0"));
         display.put("time", new JLabel("0:00"));
@@ -53,21 +53,20 @@ public class SplayerViewMain extends JFrame {
         display.put("title", new JLabel("---"));
         display.put("album", new JLabel("---"));
 
-        // TODO Cree des icones et si possible des boutons non-rectangulaires (LoÔc: Ckecker et supprimer)
+            // Buttons
         buttonPlayer = new HashMap<String, JButton>(); 
-        // Icones simples en fond des rectangles
-        // (loÔc: Attention ‡ l'odre pour le parcours de la hashmap)
         buttonPlayer.put("loop", new JButton(new ImageIcon("./data/icon/media-repeat.png")));
-        buttonPlayer.put("previous", new JButton(new ImageIcon("./data/icon/media-previous.png")));
+        buttonPlayer.put("previous", new JButton());
         buttonPlayer.put("rewind", new JButton(new ImageIcon("./data/icon/media-rewind.png")));
-        buttonPlayer.put("play", new JButton(new ImageIcon("./data/icon/media-play-pause-resume.png")));
+        buttonPlayer.put("play", new JButton());
         buttonPlayer.put("forward", new JButton(new ImageIcon("./data/icon/media-forward.png")));
-        buttonPlayer.put("next", new JButton(new ImageIcon("./data/icon/media-next.png")));
-        buttonPlayer.put("random", new JButton(new ImageIcon("./data/icon/media-shuffle.png")));
-        
+        buttonPlayer.put("next", new JButton());
         // TODO Trouver un meilleur emplacement
-        buttonPlayer.put("playlist", new JButton(new ImageIcon("./data/icon/media-search.png")));
+        buttonPlayer.put("playlist", new JButton());
+        // TODO Les icones disparait car l'association avec un AbstractAction reset tout !
+                // C'est donc l'action qui doit posséder les éléments graphiques et non le bouton (oui, c'est bizarre, c'est pas à moi qui faut demander mais dans certains cas c'est pratique).
         
+            // Sliders
         sliderPlayer = new JSlider(0, 100, 0);
         sliderVolume = new JSlider(0, 100, 25);
                 
@@ -115,7 +114,6 @@ public class SplayerViewMain extends JFrame {
         controlerPanel.add(buttonPlayer.get("play"));
         controlerPanel.add(buttonPlayer.get("forward"));
         controlerPanel.add(buttonPlayer.get("next"));
-        controlerPanel.add(buttonPlayer.get("random"));
         controlerPanel.add(buttonPlayer.get("playlist"));
         
 //        for (String mapKey : buttonPlayer.keySet()) {
@@ -148,7 +146,7 @@ public class SplayerViewMain extends JFrame {
         this.setLocationRelativeTo(null);
     }
     
-    /* Action stage */
+    /* Interface stage */
     /**
      * Modifie le texte d'un élément du lecteur.
      * @param labelName code label à modifier (ex: "title" pour modifier le titre)
@@ -186,7 +184,8 @@ public class SplayerViewMain extends JFrame {
      */
     public void setAction(String buttonName, AbstractAction action)
     {
-        buttonPlayer.get(buttonName).setAction(action);
+        if( buttonPlayer.containsKey(buttonName) )
+            buttonPlayer.get(buttonName).setAction(action);
     }
     
     public void addVolumeListener(ChangeListener listener)

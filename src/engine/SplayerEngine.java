@@ -2,12 +2,14 @@ package engine;
 
 import java.awt.event.MouseListener;
 
+import view.ActionShuffle;
 import view.SplayerViewManager;
 import data.MusicHandler;
 import data.SplayerDataManager;
 import engine.action.ActionNextMusic;
 import engine.action.ActionPlay;
 import engine.action.ActionPreviousMusic;
+import engine.action.ActionRemoveItem;
 import engine.listener.SplayerMouseListener;
 import engine.listener.SplayerSliderListener;
 import engine.listener.SplayerVolumeListener;
@@ -20,6 +22,9 @@ public class SplayerEngine {
     private SplayerDataManager sdm;
     private SplayerViewManager svm;
     
+        // Internal data
+    private int selectedIndex;
+    
     /* Action stage */
     private MouseListener actionMouse;
     
@@ -30,6 +35,7 @@ public class SplayerEngine {
         this.player = new Player();
         this.sdm = sdm;
         this.svm = svm;
+        this.selectedIndex = -1;
         
         // MVC is magic !
         this.sdm.addObserver(this.svm);
@@ -48,6 +54,10 @@ public class SplayerEngine {
         this.svm.setAction("play", new ActionPlay(this));
         this.svm.setAction("next", new ActionNextMusic(this));
         this.svm.setAction("previous", new ActionPreviousMusic(this));
+        this.svm.setAction("shuffle", new ActionShuffle(this));
+        this.svm.setAction("removeItem", new ActionRemoveItem(this));
+        
+        // Handler mapping
         this.svm.setPlaylistHandler(new MusicHandler(this.sdm));
         
         // Post-init messages
@@ -57,7 +67,7 @@ public class SplayerEngine {
     
     /* SPlayer stage */
     /**
-     * Démarre l'application.
+     * Demarre l'application.
      */
     public void launch()
     {
@@ -65,7 +75,7 @@ public class SplayerEngine {
     }
 
     /**
-     * Démarre/arrête la lecture de la musique en cours.
+     * D≈Ωmarre/arrete la lecture de la musique en cours.
      */
     public void playPause()
     {
@@ -88,10 +98,10 @@ public class SplayerEngine {
     public void nextMusic()
     {
         player.setPath( sdm.nextMusic(true) );
-    } // TODO Si l'utilisateur a désactivé le bouclage, ça ne doit pas boucler !!!!!
+    } // TODO Si l'utilisateur a desactive le bouclage, ca ne doit pas boucler !!!!!
     
     /**
-     * Passe à la musique précédente dans la playlist et la joue si la lecture est en cours.
+     * Passe ÀÜ la musique pr≈Ωc≈Ωdente dans la playlist et la joue si la lecture est en cours.
      */
     public void previousMusic()
     {
@@ -99,8 +109,8 @@ public class SplayerEngine {
     }
     
     /**
-     * Joue la musique se trouvant à l'index correspondant.
-     * @param playlistIndex index de playlist de la musique à jouer
+     * Joue la musique se trouvant ÀÜ l'index correspondant.
+     * @param playlistIndex index de playlist de la musique ÀÜ jouer
      */
     public void playThisMusic(int playlistIndex)
     {
@@ -124,4 +134,39 @@ public class SplayerEngine {
     {
         player.setPosition(positionInMilliSec);
     }
+    
+    /**
+     * Mélange la playlist.
+     */
+    public void shufflePlaylist()
+    {
+        sdm.shufflePlaylist();
+    }
+
+    /* Restricted stage */
+    /**
+     * Méthode réservée au SplayerEngine pour connaître à tout moment
+     * quelle musique est sélectionnée dans la liste. Attention, à
+     * ne pas confondre avec la musique en cours de lecture.
+     * L'utilisateur peut cliquer sur une musique sans la jouer.
+     * Cette méthode est uniquement appelée par un event pour renseigner le
+     * SplayerEngine.
+     * @param selectedIndex
+     */
+    public void setSelectedMusic(int selectedIndex)
+    {
+        this.selectedIndex = selectedIndex;
+    }
+
+    /**
+     * Méthode réservée.
+     */
+    public void removeSelectedMusic()
+    {
+        if( selectedIndex != -1 )
+            sdm.removeMusic(selectedIndex);
+        selectedIndex = -1;
+    }
+    
+    
 }
