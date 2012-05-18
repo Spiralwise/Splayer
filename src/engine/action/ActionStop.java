@@ -8,21 +8,21 @@ import javax.swing.ImageIcon;
 import engine.SplayerEngine;
 
 @SuppressWarnings("serial")
-public class ActionEmpty extends AbstractAction {
+public class ActionStop extends AbstractAction {
 
     private SplayerEngine engine;
     
-    public ActionEmpty(SplayerEngine engine)
+    public ActionStop(SplayerEngine engine)
     {
-        super("", new ImageIcon("./data/icon/media-empty.png"));
+        super("", new ImageIcon("./data/icon/media-stop.png"));
         this.engine = engine;
-        this.putValue(SHORT_DESCRIPTION, "Vider la playlist");
+        this.putValue(SHORT_DESCRIPTION, "Arrêter");
     }
     
     @Override
     public void actionPerformed(ActionEvent event)
     {
-        engine.emptyPlaylist();
+        engine.stop();
     }
 
 }

@@ -7,21 +7,20 @@ import javax.swing.AbstractAction;
 import engine.SplayerEngine;
 
 @SuppressWarnings("serial")
-public class ActionPlay extends AbstractAction {
+public class ActionLoop extends AbstractAction {
 
-    private SplayerEngine engine;
-
-    public ActionPlay(SplayerEngine engine)
+private SplayerEngine engine;
+    
+    public ActionLoop(SplayerEngine engine)
     {
-        super("");
         this.engine = engine;
-        this.putValue(SHORT_DESCRIPTION, "Lecture/pause");
+        this.putValue(SHORT_DESCRIPTION, "Jouer en boucle la playlist");
     }
     
     @Override
     public void actionPerformed(ActionEvent event)
     {
-        engine.playPause();
+        engine.toggleLoop();
     }
-    
+
 }

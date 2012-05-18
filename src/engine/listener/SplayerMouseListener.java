@@ -43,7 +43,7 @@ public class SplayerMouseListener extends MouseAdapter
             engine.triggerForward(Player.REWIND);
     }
     
-    public void mouseReleased(MouseEvent event)
+    public void mouseReleased(MouseEvent event) throws NullPointerException
     {
         JComponent component = (JComponent)event.getSource();
         if( component.getName().equals("forward")

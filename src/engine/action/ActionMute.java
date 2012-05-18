@@ -1,26 +1,26 @@
-package view;
+package engine.action;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 
 import engine.SplayerEngine;
 
-public class ActionShuffle extends AbstractAction {
+@SuppressWarnings("serial")
+public class ActionMute extends AbstractAction {
 
     private SplayerEngine engine;
     
-    public ActionShuffle(SplayerEngine engine)
+    public ActionMute(SplayerEngine engine)
     {
-        super("", new ImageIcon("./data/icon/media-shuffle.png"));
         this.engine = engine;
+        this.putValue(SHORT_DESCRIPTION, "Coupe/Met le son");
     }
     
     @Override
     public void actionPerformed(ActionEvent event)
     {
-        engine.shufflePlaylist();
+        engine.toggleMute();
     }
 
 }

@@ -16,6 +16,7 @@ public class ActionPreviousMusic extends AbstractAction {
     {
         super("", new ImageIcon("./data/icon/media-previous.png"));
         this.engine = engine;
+        this.putValue(SHORT_DESCRIPTION, "Musique précédente");
     }
     
     @Override

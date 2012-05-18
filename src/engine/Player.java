@@ -22,8 +22,9 @@ public class Player extends Observable {
     private String currentPath;
     
     private int state;
-    private float volume = (float) 0.4;
+    private float volume = (float) 0.4, savedVolume;
     private int position = 0;
+    private boolean paused, muted;
 
     /* Builder stage */
     public Player()
@@ -31,6 +32,8 @@ public class Player extends Observable {
         this.player         = null;
         this.currentPath    = "";
         this.state          = STOP;
+        this.paused         = false;
+        this.muted          = false;
         this.setChanged();
     }
 
@@ -44,7 +47,6 @@ public class Player extends Observable {
             if( path != null )
             {
                 player = new LillePlayer(currentPath);
-                player.setVolume(10);
                 Equalizer eq = new Equalizer();
                 eq.getBand(0);
             }
@@ -66,13 +68,23 @@ public class Player extends Observable {
                 LaunchListenThread llt = new LaunchListenThread(player);
                 llt.start();
                 state = PLAY;
+                setChanged();
+                notifyObservers("play");
             }
             else {
-               System.out.println("No music loaded.");
+                System.out.println("No music loaded.");
                 state = STOP;
+                setChanged();
+                notifyObservers("pause");
             }
         }else if(state == PLAY){
             player.pause();
+            paused = !paused;
+            setChanged();
+            if( paused )
+                notifyObservers("pause");
+            else
+                notifyObservers("play");
         }
     }
     
@@ -87,7 +99,10 @@ public class Player extends Observable {
     public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrête la musique.
         if(state == LOAD || state == PLAY) {
             state = STOP;
+            paused = false;
             player.close();
+            setChanged();
+            notifyObservers("stop");
         }
     }
     
@@ -113,7 +128,9 @@ public class Player extends Observable {
     // TODO Apparemment c'est en valeur logarithmique ! Conversion nécessaire pour être user-friendly
     public void setVolume(float level){
         volume = level;
-        if( player != null)
+        if( volume > 0 )
+            muted = false;
+        if( player != null )
             player.setVolume(level);
         setChanged();
         notifyObservers("volumeUpdate");
@@ -153,8 +170,38 @@ public class Player extends Observable {
      */
     public void stopForward()
     {
-        ft.interrupt();
-        
+        ft.interrupt();   
+    }
+    
+    /**
+     * Coupe/met le son.
+     */
+    public void mute()
+    {
+        muted = !muted;
+        if( muted ) {
+            savedVolume = volume;
+            setVolume(0);
+        }
+        else
+            setVolume(savedVolume);   
+    }
+    
+    /**
+     * Indique si le son du player a été coupé.
+     * @return
+     */
+    public boolean isMute()
+    {
+        return muted;
+    }
+    
+    /**
+     * Methode reservee a l'engine.
+     */
+    public void forceSetChanged()
+    {
+        setChanged();
     }
     
     class LaunchListenThread extends Thread{
@@ -170,17 +217,18 @@ public class Player extends Observable {
                 
                 while(!playerInterne.isComplete()){
                     position = playerInterne.getPosition();
-                    if(player == playerInterne)
-                        //System.out.println("PositionEvent");
-                    try{
-                        Thread.sleep(clockrate);
-                        setChanged();
-                        notifyObservers("timerUpdate");
-                    }catch(Exception e){ e.printStackTrace(); }
+                    if(player == playerInterne && state == PLAY)
+                        try{
+                            //playerInterne.setVolume(volume);
+                            Thread.sleep(clockrate);
+                            setChanged();
+                            notifyObservers("timerUpdate");
+                        } catch(Exception e) {
+                            e.printStackTrace(); }
                 }
                 
                 if(player == playerInterne) {
-                    System.out.println("EndEvent " + state);
+                    //System.out.println("EndEvent " + state);
                     if( state == PLAY ) { // Le player etait en train de jouer et n'a pas ete arrete par le bouton stop.
                         setChanged();
                         notifyObservers("engine.nextMusic");
@@ -209,11 +257,12 @@ public class Player extends Observable {
         private boolean rewind;
         private boolean wasPlaying;
         
+        // TODO Le forward fait tout bugué s'il arrive au bout.
         public ForwardThread(int internalState, boolean rewind)
         {
             this.rewind = rewind;
             Stop();
-            System.out.println("Internal state : " + internalState);
+            //System.out.println("Internal state : " + internalState);
             wasPlaying = (internalState == PLAY);
         }
         
@@ -241,4 +290,5 @@ public class Player extends Observable {
             }
         }
     }
+    
 }

@@ -16,6 +16,7 @@ public class ActionNextMusic extends AbstractAction {
     {
         super("", new ImageIcon("./data/icon/media-next.png"));
         this.engine = engine;
+        this.putValue(SHORT_DESCRIPTION, "Musique suivante");
     }
     
     @Override

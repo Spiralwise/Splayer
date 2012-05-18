@@ -3,6 +3,7 @@ package engine.action;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 
 import engine.SplayerEngine;
 
@@ -13,8 +14,9 @@ public class ActionRemoveItem extends AbstractAction {
     
     public ActionRemoveItem(SplayerEngine engine)
     {
-        super("ICON_REM");
+        super("", new ImageIcon("./data/icon/media-remove.png"));
         this.engine = engine;
+        this.putValue(SHORT_DESCRIPTION, "Retirer musique de la playlist");
     }
     
     @Override

@@ -150,9 +150,31 @@ public class SplayerDataManager extends Observable {
         setChanged();
         notifyObservers("playlistSelection");
     }
-    
+
+    /**
+     * Mélange la playlist en cours.
+     */
     public void shufflePlaylist()
     {
         playlist.shuffle();
+    }
+
+    /**
+     * Active/désactive le loop
+     */
+    public void loop()
+    {
+        playlist.toggleLoop();
+        setChanged();
+        notifyObservers("toggleLoop");
+    }
+    
+    /**
+     * Renvoie true si la répétition est activée pour la playlist courrante.
+     * @return
+     */
+    public boolean isLoop()
+    {
+        return playlist.isLoop();
     }
 }

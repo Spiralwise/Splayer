@@ -7,12 +7,14 @@ public class Playlist {
 
     /* Data stage */
     private int index;
+    private boolean loop;
     private DefaultListModel list;
     
     /* Builder stage */
     public Playlist()
     {
         this.index = -1; // -1 = Aucune musique en cours
+        this.loop = false;
         this.list = new DefaultListModel();
         // TODO G≈Ωrer le cas oÔøΩ on envoie une liste de la bibliothÔøΩque
     }
@@ -49,10 +51,12 @@ public class Playlist {
         else
             index --;
         
-        if( index >= list.getSize() )
+        if( index >= list.getSize() && loop )
             index = 0;
         else if( index < 0 )
             index = list.getSize() - 1;
+        else if( index >= list.getSize() && !loop )
+            index = -1;
     }
     
     /**
@@ -173,5 +177,22 @@ public class Playlist {
         }
         // Restauration de l'index
         index = list.indexOf(bufferMusic);
+    }
+    
+    /**
+     * Active/désactive le loop
+     */
+    public void toggleLoop()
+    {
+        loop = !loop;
+    }
+
+    /**
+     * Renvoie true si la répétition est activée.
+     * @return
+     */
+    public boolean isLoop()
+    {
+        return loop;
     }
 }

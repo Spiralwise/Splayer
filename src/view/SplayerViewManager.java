@@ -7,11 +7,14 @@ import java.util.Observer;
 
 import javax.swing.AbstractAction;
 import javax.swing.TransferHandler;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 
 import data.Music;
 import data.SplayerDataManager;
+import de.javasoft.plaf.synthetica.SyntheticaClassyLookAndFeel;
 import engine.Player;
+import engine.action.ActionOpenLibrary;
 import engine.action.ActionOpenPlaylist;
 import engine.listener.SplayerSliderListener;
 import engine.listener.SplayerVolumeListener;
@@ -22,17 +25,23 @@ public class SplayerViewManager implements Observer {
 
     /* Data stage */
     private SplayerViewMain viewMain;
-    private SplayerViewPlaylist viewPlaylist;
+    private SplayerViewPlaylist viewLibrary;
     
     /* Builder stage */
     public SplayerViewManager()
     {
+        try {
+            UIManager.setLookAndFeel(new SyntheticaClassyLookAndFeel());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // Building
         this.viewMain       = new SplayerViewMain();
-        this.viewPlaylist   = new SplayerViewPlaylist();
+        this.viewLibrary   = new SplayerViewPlaylist();
         
         // Action mapping
-        this.viewMain.setAction("playlist", new ActionOpenPlaylist(viewPlaylist));
+        this.viewMain.setAction("library", new ActionOpenLibrary(viewLibrary));
+        this.viewMain.setAction("playlist", new ActionOpenPlaylist(viewMain));
         
         // Post-init messages
         System.out.println("Splayer:ViewManager initialized.");
@@ -45,30 +54,58 @@ public class SplayerViewManager implements Observer {
         
         // Mise à jour du timer
         if( argument.equals("timerUpdate") )
-    		updateTimer( Math.round( ((Player)model).getPosition() ) );
+    		updateTimer( Math.round( ((Player)model).getPosition() ) ); 
+        // Lancement de la musique
+        else if( argument.equals("play") ) {
+            this.viewMain.setPlayButton(false);
+        }
+        // Met en pause la musique
+        else if( argument.equals("pause")) {
+            this.viewMain.setPlayButton(true);
+        }
+        // Arret complet de la musique
+        else if( argument.equals("stop")) {
+            this.viewMain.setPlayButton(true);
+            updateTimer(0);
+        }
         // Mise à jour de la sélection (changement de musique)
-        if( argument.equals("playlistSelection") ) {
+        else if( argument.equals("playlistSelection") ) {
             Music current = ((SplayerDataManager)model).getCurrentMusic();
             this.viewMain.updateData(current);
         }
         // Ajout d'une musique à playlist
         else if( argument.equals("playlistUpdate") ) { // TODO cette update semble inutile ?
-            this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
+            this.viewMain.setPlaylist( ((SplayerDataManager)model).getPlaylist());
         }
         // Modification du volume
         else if( argument.equals("volumeUpdate") ) {
-            this.viewMain.setDisplay("volume", "" + Math.round(((Player)model).getVolume()*100) );
+            int volume = Math.round( ((Player)model).getVolume()*100 );
+            this.viewMain.setDisplay("volume",  "" + volume);
+            this.viewMain.setvolume(volume);
+            this.viewMain.setVolumeIcon((int) Math.ceil(volume/40.0));
+            if( ((Player)model).isMute() )
+                this.viewMain.setVolumeIcon(-1);
+        }
+        // Active/desactive le loop
+        else if( argument.equals("toggleLoop") ) {
+            this.viewMain.toggleLoopIcon( ((SplayerDataManager)model).isLoop() );
         }
         // Initialisation de l'application
         else if( argument.equals("initialization") ) {
-            this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
+            this.viewMain.setPlaylist( ((SplayerDataManager)model).getPlaylist());
             Music current = ((SplayerDataManager)model).getCurrentMusic();
+            this.viewMain.toggleLoopIcon( ((SplayerDataManager)model).isLoop() );
             this.viewMain.updateData(current);
+            this.viewMain.pack();
         }
         // Initialisation du player
         else if( argument.equals("playerInit") ) {
-            this.viewMain.setDisplay("volume", "" + Math.round(((Player)model).getVolume()*100) );
+            int volume = Math.round(((Player)model).getVolume()*100);
+            this.viewMain.setDisplay("volume", "" + volume);
+            this.viewMain.setVolumeIcon((int) Math.ceil(volume/40.0));
             this.viewMain.setvolume( (int) (((Player)model).getVolume() * 100) );
+            this.viewMain.setPlayButton(true);
+            this.viewMain.pack();
         }
     }
     
@@ -88,7 +125,7 @@ public class SplayerViewManager implements Observer {
     public void setAction(String buttonName, AbstractAction action)
     {
         viewMain.setAction(buttonName, action);
-        viewPlaylist.setAction(buttonName, action);
+        viewLibrary.setAction(buttonName, action);
     }
     
     public void setListener(String componentName, Object listener)
@@ -96,7 +133,7 @@ public class SplayerViewManager implements Observer {
         // Listener pour la playlist
         if( listener instanceof MouseListener ) {
             if( componentName.equals("PLAYLIST") )
-                viewPlaylist.setPlaylistListener(listener);
+                viewMain.setPlaylistListener(listener);
             else
                 viewMain.setListener(componentName, listener);
         }
@@ -113,7 +150,7 @@ public class SplayerViewManager implements Observer {
     
     public void setPlaylistHandler(TransferHandler handler)
     {
-        viewPlaylist.setPlaylistHandler(handler);
+        viewMain.setPlaylistHandler(handler);
     }
     
     /* Implementation stage */
