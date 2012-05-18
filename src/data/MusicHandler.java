@@ -52,11 +52,12 @@ public class MusicHandler extends TransferHandler {
         // Importation d'une musique depuis l'explorateur de fichiers
         if(info.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
         {
+            JList list = ((JList)info.getComponent());
             try {
                 String filename = "";
                 List files = (List)(t.getTransferData(DataFlavor.javaFileListFlavor));
                 filename = ((File)files.get(0)).getAbsolutePath();
-                sdm.addToPlaylist(new Music(filename));
+                sdm.addToPlaylistAt(new Music(filename), list.getDropLocation().getIndex());
                 return true;
             } catch(Exception e) {
                 e.printStackTrace();

@@ -9,14 +9,16 @@ import javazoom.jl.player.LillePlayer;
 public class Player extends Observable {
     
     /* Enum stage */
-    public final static int STOP = 0;
-    public final static int LOAD = 1;
-    public final static int PLAY = 2;
+    public final static int STOP    = 0;
+    public final static int LOAD    = 1;
+    public final static int PLAY    = 2;
+    public final static int FORWARD = 3;
+    public final static int REWIND  = 4;
     
     /* Data stage */
-    private final static int clockrate = 200; 
-            
+    private final static int clockrate = 200;
     private LillePlayer player;
+    private ForwardThread ft;
     private String currentPath;
     
     private int state;
@@ -83,9 +85,9 @@ public class Player extends Observable {
     }
     
     public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrête la musique.
-        if(state == LOAD || state == PLAY){
-            player.close();
+        if(state == LOAD || state == PLAY) {
             state = STOP;
+            player.close();
         }
     }
     
@@ -136,6 +138,25 @@ public class Player extends Observable {
         position = pos;
     }
     
+    /**
+     * Déclenche le forward
+     * @param rewind si true, alors déclenche le rewind
+     */
+    public void doForward(boolean rewind)
+    {
+        ft = new ForwardThread(state, rewind);
+        ft.start();
+    }
+    
+    /**
+     * Arrête le forward ou le rewind
+     */
+    public void stopForward()
+    {
+        ft.interrupt();
+        
+    }
+    
     class LaunchListenThread extends Thread{
         private LillePlayer playerInterne;
         public LaunchListenThread(LillePlayer p){
@@ -158,8 +179,13 @@ public class Player extends Observable {
                     }catch(Exception e){ e.printStackTrace(); }
                 }
                 
-                if(player == playerInterne)
-                    System.out.println("EndEvent");
+                if(player == playerInterne) {
+                    System.out.println("EndEvent " + state);
+                    if( state == PLAY ) { // Le player etait en train de jouer et n'a pas ete arrete par le bouton stop.
+                        setChanged();
+                        notifyObservers("engine.nextMusic");
+                    }
+                }
             }catch(Exception e){ e.printStackTrace(); }
         }
         
@@ -172,4 +198,47 @@ public class Player extends Observable {
         }
     }
 
+    /**
+     * Gère le forward/rewind en thread pour une meilleure efficacité.
+     */
+    class ForwardThread extends Thread {
+        
+        private static final int forwardSpeed = 2000;
+        private static final int forwardRate  = 50;
+        
+        private boolean rewind;
+        private boolean wasPlaying;
+        
+        public ForwardThread(int internalState, boolean rewind)
+        {
+            this.rewind = rewind;
+            Stop();
+            System.out.println("Internal state : " + internalState);
+            wasPlaying = (internalState == PLAY);
+        }
+        
+        public void run()
+        {
+            try {
+                while(!interrupted()) {
+                    Thread.sleep(forwardRate);
+                    if(rewind) {
+                        position -= forwardSpeed;
+                        if(position < 0)
+                            position = 0;
+                    }
+                    else
+                        position += forwardSpeed;
+                    setChanged();
+                    notifyObservers("timerUpdate");
+                }
+            } catch (InterruptedException e) {
+                if(wasPlaying) {
+                    Play();
+                    setPosition(position); // TODO Passer à la musique suivante si on arrive au bout (ce qui n'est pour l'instant n'est pas facile à détecter ...
+                }
+                //e.printStackTrace();
+            }
+        }
+    }
 }

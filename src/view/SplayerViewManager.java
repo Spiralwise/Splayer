@@ -49,12 +49,10 @@ public class SplayerViewManager implements Observer {
         // Mise à jour de la sélection (changement de musique)
         if( argument.equals("playlistSelection") ) {
             Music current = ((SplayerDataManager)model).getCurrentMusic();
-            if( current != null ) {
-                this.viewMain.updateData(current);
-            }
+            this.viewMain.updateData(current);
         }
         // Ajout d'une musique à playlist
-        else if( argument.equals("playlistUpdate") ) { // TODO créer un enum pour les updates ?
+        else if( argument.equals("playlistUpdate") ) { // TODO cette update semble inutile ?
             this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
         }
         // Modification du volume
@@ -65,9 +63,7 @@ public class SplayerViewManager implements Observer {
         else if( argument.equals("initialization") ) {
             this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
             Music current = ((SplayerDataManager)model).getCurrentMusic();
-            if( current != null ) {
-                this.viewMain.updateData(current);
-            }
+            this.viewMain.updateData(current);
         }
         // Initialisation du player
         else if( argument.equals("playerInit") ) {
@@ -101,6 +97,8 @@ public class SplayerViewManager implements Observer {
         if( listener instanceof MouseListener ) {
             if( componentName.equals("PLAYLIST") )
                 viewPlaylist.setPlaylistListener(listener);
+            else
+                viewMain.setListener(componentName, listener);
         }
         // Listener pour le slider de volume
         else if( listener instanceof  SplayerVolumeListener )

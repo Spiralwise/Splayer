@@ -56,12 +56,13 @@ public class SplayerDataManager extends Observable {
     // TODO Pas de code ? Vérifier que ça existait déjà. Sinon implémenter
 
     /**
-     * Ajoute une musique a la suite de la playlist courrante.
+     * Ajoute une musique à la playlist courrante à l'emplacement indiqué.
      * @param music
+     * @param index
      */
-    public void addToPlaylist(Music music)
+    public void addToPlaylistAt(Music music, int index)
     {
-        playlist.add(music);
+        playlist.addAt(music, index);
         setChanged();
         notifyObservers("playlistUpdate");
     }
@@ -129,11 +130,27 @@ public class SplayerDataManager extends Observable {
         playlist.move(selectedindex, insertindex);
     }
     
+    /**
+     * Retire une musique de la playlist courrante.
+     * @param removeindex
+     */
     public void removeMusic(int removeindex)
     {
         playlist.remove(removeindex);
+        setChanged();
+        notifyObservers("playlistSelection");
     }
-
+    
+    /**
+     * Vide toute la playlist en cours.
+     */
+    public void emptyPlaylist()
+    {
+        playlist.empty();
+        setChanged();
+        notifyObservers("playlistSelection");
+    }
+    
     public void shufflePlaylist()
     {
         playlist.shuffle();

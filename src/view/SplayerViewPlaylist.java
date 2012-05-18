@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseListener;
@@ -8,13 +10,15 @@ import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
 
@@ -38,6 +42,8 @@ public class SplayerViewPlaylist extends JFrame {
         // TODO Si à terme il ne reste que un ou deux boutons, autant ne pas faire de hashmap. Sauf si on fusionne tous les boutons dans le ViewManager.
 	private JList playlist;
 	private JTable bibliotheque;
+	// Ergo components
+	private JTextArea tutoDnDPlaylist;
 
     public SplayerViewPlaylist()
     {
@@ -51,6 +57,7 @@ public class SplayerViewPlaylist extends JFrame {
             // Buttons
         buttonPlaylist = new HashMap<String, JButton>();
         buttonPlaylist.put("removeItem", new JButton());
+        buttonPlaylist.put("empty", new JButton());
         buttonPlaylist.put("shuffle", new JButton());
 
             // Playlist
@@ -62,20 +69,32 @@ public class SplayerViewPlaylist extends JFrame {
             // Library
         bibliotheque = new JTable(new Library()); // TODO From Seb : Attention !!! La bibliothèque doit être créer par la DataManager !
         
+            // Ergo
+        // TODO Rendre plus joli et effacer si déjà effectué un Dnd
+        tutoDnDPlaylist = new JTextArea("Cliquez-glissez un fichier mp3 dans la playlist depuis la bibliothèque ou votre explorateur de fichiers.");
+        tutoDnDPlaylist.setEnabled(false);
+        tutoDnDPlaylist.setLineWrap(true);
+        tutoDnDPlaylist.setWrapStyleWord(true);
+        tutoDnDPlaylist.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+        
         // Layout
         GridBagConstraints layoutManager = new GridBagConstraints();
         layoutManager.fill = GridBagConstraints.BOTH;
         
             // Playlist panel
         playlistPanel = new JPanel(new GridBagLayout()); // TODO Il faurait aussi qu'on puisse afficher le temps.
-        layoutManager.gridwidth = 4;
+        layoutManager.gridwidth = 5;
         playlistPanel.add(scrollPlaylist, layoutManager);
         layoutManager.gridx = 0;
         layoutManager.gridy = 1;
+        playlistPanel.add(tutoDnDPlaylist, layoutManager);
+        layoutManager.gridy = 2;
         layoutManager.gridwidth = 1;
         playlistPanel.add(buttonPlaylist.get("shuffle"), layoutManager);
         layoutManager.gridx = 3;
         playlistPanel.add(buttonPlaylist.get("removeItem"), layoutManager);
+        layoutManager.gridx = 4;
+        playlistPanel.add(buttonPlaylist.get("empty"), layoutManager);
         
             // Library panel
         libraryPanel = new JPanel();
@@ -90,6 +109,7 @@ public class SplayerViewPlaylist extends JFrame {
         // Packing
         this.add(panel);
         this.pack();
+        this.setResizable(false);
         this.setLocationRelativeTo(null);
     }
     

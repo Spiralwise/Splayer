@@ -1,11 +1,14 @@
 package engine;
 
 import java.awt.event.MouseListener;
+import java.util.Observable;
+import java.util.Observer;
 
 import view.ActionShuffle;
 import view.SplayerViewManager;
 import data.MusicHandler;
 import data.SplayerDataManager;
+import engine.action.ActionEmpty;
 import engine.action.ActionNextMusic;
 import engine.action.ActionPlay;
 import engine.action.ActionPreviousMusic;
@@ -15,7 +18,7 @@ import engine.listener.SplayerSliderListener;
 import engine.listener.SplayerVolumeListener;
 import engine.listener.SplayerWindowListener;
 
-public class SplayerEngine {
+public class SplayerEngine implements Observer {
 
     /* Data stage */
     private Player player;
@@ -33,6 +36,8 @@ public class SplayerEngine {
     {
         // Init
         this.player = new Player();
+        this.player.Load(sdm.getCurrentMusicPath());
+        this.player.Stop();
         this.sdm = sdm;
         this.svm = svm;
         this.selectedIndex = -1;
@@ -40,6 +45,7 @@ public class SplayerEngine {
         // MVC is magic !
         this.sdm.addObserver(this.svm);
         this.player.addObserver(this.svm);
+        this.player.addObserver(this);
         this.sdm.notifyObservers("initialization");
         this.player.notifyObservers("playerInit");
         
@@ -51,11 +57,16 @@ public class SplayerEngine {
         this.svm.setListener("PLAYER", new SplayerSliderListener(this));
         
         // Action mapping
+            // TODO gros todo ! Certaines actions sont relayées par l'engine vers le sdm alors que le sdm pourrait être directement contacté (mais est-ce encore du MVC dans ce cas ?)
         this.svm.setAction("play", new ActionPlay(this));
         this.svm.setAction("next", new ActionNextMusic(this));
         this.svm.setAction("previous", new ActionPreviousMusic(this));
         this.svm.setAction("shuffle", new ActionShuffle(this));
         this.svm.setAction("removeItem", new ActionRemoveItem(this));
+        this.svm.setAction("empty", new ActionEmpty(this));
+            // Action by listener
+        this.svm.setListener("forward", actionMouse);
+        this.svm.setListener("rewind", actionMouse);
         
         // Handler mapping
         this.svm.setPlaylistHandler(new MusicHandler(this.sdm));
@@ -63,6 +74,22 @@ public class SplayerEngine {
         // Post-init messages
         System.out.println("Splayer:Engine initialized.");
         System.out.println("Splayer:Ready to launch !");
+    }
+    
+    /* Observer stage */
+    /**
+     * Le SplayerEngine est un observeur afin qu'il sache si son player a
+     * terminer de lire une musique et puisse lui envoyer la suivante.
+     */
+    @Override
+    public void update(Observable obs, Object o)
+    {
+        String argument = (String)o;
+        // Lecture jusqu'a la fin
+        if( argument.equals("engine.nextMusic") ) {
+            nextMusic();
+            playPause();
+        }
     }
     
     /* SPlayer stage */
@@ -136,6 +163,24 @@ public class SplayerEngine {
     }
     
     /**
+     * Déclenche le forward ou le rewind.
+     * @param way Player.FORWARD ou Player.REWIND
+     */
+    public void triggerForward(int way)
+    {
+        switch(way) {
+        case Player.FORWARD:
+            player.doForward(false);
+            break;
+        case Player.REWIND:
+            player.doForward(true);
+            break;
+        default:
+            player.stopForward();
+        }
+    }
+    
+    /**
      * Mélange la playlist.
      */
     public void shufflePlaylist()
@@ -167,6 +212,13 @@ public class SplayerEngine {
             sdm.removeMusic(selectedIndex);
         selectedIndex = -1;
     }
-    
+
+    /**
+     * Vide la playlist courrante.
+     */
+    public void emptyPlaylist()
+    {
+        sdm.emptyPlaylist();
+    } 
     
 }

@@ -56,7 +56,7 @@ public class Playlist {
     }
     
     /**
-     * Ajoute une musique Ë† la fin de la playlist.
+     * Ajoute une musique a la fin de la playlist.
      * @param music
      */
     public void add(Music music)
@@ -67,15 +67,27 @@ public class Playlist {
     }
     
     /**
+     * Ajoute une musique a l'emplacement indique.
+     * @param music
+     * @param insertindex
+     */
+    public void addAt(Music music, int insertindex)
+    {
+        list.add(insertindex, music);
+        // Recaller l'index courrant en consŽquence
+        if( insertindex < index )
+            index++;
+    }
+    
+    /**
      * Retourne l'objet musique en cours de lecture.
      * @return l'objet musique en cours de lecture
      */
     public Music getCurrentMusic()
     {
-        if( index != -1 )
-            return (Music)list.getElementAt(index);
-        else
+        if( index < 0 )
             return null;
+        return (Music)list.getElementAt(index);            
     }
     
     /**
@@ -84,7 +96,7 @@ public class Playlist {
      */
     public String getCurrentMusicPath()
     {
-        if( index == -1 )
+        if( index < 0 )
             return null;
         return ((Music)list.getElementAt(index)).getPath();
     }
@@ -130,7 +142,18 @@ public class Playlist {
             list.remove(removeindex);
             if( removeindex > index )
                 index--;
+            if( index < -1 && !list.isEmpty() )
+                index = 0;
         }
+    }
+    
+    /**
+     * Vide la playlist.
+     */
+    public void empty()
+    {
+        list.removeAllElements();
+        index = -1;
     }
     
     /**

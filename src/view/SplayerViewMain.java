@@ -3,6 +3,7 @@ package view;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 
 import javax.swing.AbstractAction;
@@ -57,14 +58,18 @@ public class SplayerViewMain extends JFrame {
         buttonPlayer = new HashMap<String, JButton>(); 
         buttonPlayer.put("loop", new JButton(new ImageIcon("./data/icon/media-repeat.png")));
         buttonPlayer.put("previous", new JButton());
-        buttonPlayer.put("rewind", new JButton(new ImageIcon("./data/icon/media-rewind.png")));
         buttonPlayer.put("play", new JButton());
-        buttonPlayer.put("forward", new JButton(new ImageIcon("./data/icon/media-forward.png")));
         buttonPlayer.put("next", new JButton());
-        // TODO Trouver un meilleur emplacement
         buttonPlayer.put("playlist", new JButton());
         // TODO Les icones disparait car l'association avec un AbstractAction reset tout !
                 // C'est donc l'action qui doit posséder les éléments graphiques et non le bouton (oui, c'est bizarre, c'est pas à moi qui faut demander mais dans certains cas c'est pratique).
+                // Cas particulier pour forward et rewind qui ne sont pas définis par des actions mais par des listeners
+        JButton forward = new JButton(new ImageIcon("./data/icon/media-forward.png"));
+        JButton rewind = new JButton(new ImageIcon("./data/icon/media-rewind.png"));
+        forward.setName("forward"); // Les setName permettent au listener de distinguer les boutons entre eux.
+        buttonPlayer.put("forward", forward);
+        rewind.setName("rewind");
+        buttonPlayer.put("rewind", rewind);
         
             // Sliders
         sliderPlayer = new JSlider(0, 100, 0);
@@ -188,6 +193,12 @@ public class SplayerViewMain extends JFrame {
             buttonPlayer.get(buttonName).setAction(action);
     }
     
+    public void setListener(String buttonName, Object listener)
+    {
+        if( buttonPlayer.containsKey(buttonName) )
+            buttonPlayer.get(buttonName).addMouseListener((MouseListener) listener);
+    }    
+    
     public void addVolumeListener(ChangeListener listener)
     {
         sliderVolume.addChangeListener(listener);
@@ -205,12 +216,19 @@ public class SplayerViewMain extends JFrame {
      */
     public void updateData(Music current)
     {
-        // TODO Regler le problème des caractères invisibles
-        setDisplay("artist", current.getAuthor());
-        setDisplay("title", current.getTitle());
-        setDisplay("album", current.getAlbum());
-        int timeInSec = current.getDurationInSec();
-        setDisplay("left", (int)Math.floor(timeInSec/60) + ":" + String.format("%02d", timeInSec%60));
-        sliderPlayer.setMaximum(current.getDuration());
-    }    
+        if( current != null ) {
+            setDisplay("artist", current.getAuthor());
+            setDisplay("title", current.getTitle());
+            setDisplay("album", current.getAlbum());
+            int timeInSec = current.getDurationInSec();
+            setDisplay("left", (int)Math.floor(timeInSec/60) + ":" + String.format("%02d", timeInSec%60));
+            sliderPlayer.setMaximum(current.getDuration());
+        }
+        else {
+            setDisplay("title", "Ajouter une musique dans la playlist");
+            setDisplay("artist", "---");
+            setDisplay("album", "---");
+            setDisplay("left", "0:00");
+        }
+    }
 }
