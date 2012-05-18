@@ -27,7 +27,7 @@ import engine.listener.SplayerSliderListener;
 import engine.listener.SplayerVolumeListener;
 import engine.listener.SplayerWindowListener;
 
-public class SplayerEngine extends Thread implements Observer {
+public class SplayerEngine implements Observer {
 
     /* Data stage */
     private Player player;
@@ -56,6 +56,7 @@ public class SplayerEngine extends Thread implements Observer {
         // Listener mapping
         actionMouse = new SplayerMouseListener(this);
         this.svm.setListener("PLAYLIST", actionMouse);
+        this.svm.setListener("LIBRARY", actionMouse);
         this.svm.setListener("WINDOW", new SplayerWindowListener(this));
         this.svm.setListener("VOLUME", new SplayerVolumeListener(this));
         this.svm.setListener("PLAYER", new SplayerSliderListener(this));
@@ -134,18 +135,14 @@ public class SplayerEngine extends Thread implements Observer {
     /**
      * Arrete la musique en cours de lecture.
      */
-//    public void stop()
-//    {
-//        player.Stop();
-//    }
+    public void stop()
+    {
+        player.Stop();
+    }
     
     /**
-<<<<<<< HEAD
      * Passe ˆ la musique suivante dans la playlist et la joue si la lecture est en cours.
      * @return true si le player peut passer a la musique suivante.
-=======
-     * Passe ï¿½ la musique suivante dans la playlist et la joue si la lecture est en cours.
->>>>>>> 06cd89eec4da8a610bc50be1093afb3df552a7fc
      */
     public boolean nextMusic()
     {
@@ -168,7 +165,7 @@ public class SplayerEngine extends Thread implements Observer {
      */
     public void playThisMusic(int playlistIndex)
     {
-        player.setPath( sdm.selectMusic(playlistIndex) );
+        player.setPathAndPlay( sdm.selectMusic(playlistIndex) );
     }
 
     /**
@@ -177,7 +174,8 @@ public class SplayerEngine extends Thread implements Observer {
      */
     public void setVolume(int value)
     {
-        player.setVolume( (float) (value/100.0) );
+        player.setVolume( (float)(value/100.0) );
+        //player.setVolume( (float) Math.sqrt((double)(value/100.0)) );
     }
 
     /**
@@ -332,4 +330,9 @@ public class SplayerEngine extends Thread implements Observer {
 			System.out.println(("c good"));
 		}
 	}
+
+    public void addRandomMusic()
+    {
+        sdm.addRandomMusic();
+    }
 }

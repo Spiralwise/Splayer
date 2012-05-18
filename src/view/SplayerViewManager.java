@@ -101,6 +101,7 @@ public class SplayerViewManager implements Observer {
         // Initialisation de l'application
         else if( argument.equals("initialization") ) {
             this.viewMain.setPlaylist( ((SplayerDataManager)model).getPlaylist());
+            this.viewLibrary.setBibliotheque( ((SplayerDataManager)model).getLibrary() );
             Music current = ((SplayerDataManager)model).getCurrentMusic();
             this.viewMain.toggleLoopIcon( ((SplayerDataManager)model).isLoop() );
             this.viewMain.updateData(current);
@@ -142,6 +143,8 @@ public class SplayerViewManager implements Observer {
         if( listener instanceof MouseListener ) {
             if( componentName.equals("PLAYLIST") )
                 viewMain.setPlaylistListener(listener);
+            else if( componentName.equals("LIBRARY") )
+                viewLibrary.setLiblistListener(listener);
             else
                 viewMain.setListener(componentName, listener);
         }

@@ -20,6 +20,8 @@ public class SplayerDataManager extends Observable {
     private Playlist playlist;
     private Library library;
     
+    private String [] cache; // Pour simuler des musiques sur le système de fichier. 
+    
     /* Builder stage */
     public SplayerDataManager()
     {
@@ -28,14 +30,19 @@ public class SplayerDataManager extends Observable {
         this.library = new Library();
         
         // Loading music samples
-        this.connect("lol");
+        this.connect("");
         
+        cache = new String[7];
          try {
-			playlist.add(new Music("./data/music/Sonic 3 - Credits [Pitched Up].mp3"));
-			playlist.add(new Music("./data/music/01 Act On Instinct.mp3"));
-			playlist.add(new Music("./data/music/01 Hell March.mp3"));
-			playlist.add(new Music("./data/music/01 Head Like A Hole.mp3"));
-			playlist.add(new Music("./data/music/02 Quake Main Theme.mp3"));
+            cache[0] = "./data/music/01 Act On Instinct.mp3";
+            cache[1] = "./data/music/Sonic 3 - Credits [Pitched Up].mp3";
+            cache[2] = "./data/music/01 Hell March.mp3";
+            cache[3] = "./data/music/01 Head Like A Hole.mp3";
+            cache[4] = "./data/music/02 Quake Main Theme.mp3";
+            cache[5] = "./data/music/Sonic 3 - Hydrocity Zone Act 2 [Pitched Up].mp3";
+            cache[6] = "./data/music/13 School.mp3";
+            for(int i=0; i<3; i++) // On ne met qu les 3 premières
+                playlist.add(new Music(cache[i]));
         } catch (IOException e) {
             System.err.println("Splayer:DataManager: Can't open file.");
             e.printStackTrace();
@@ -69,7 +76,7 @@ public class SplayerDataManager extends Observable {
     		Statement statement = connection.createStatement();
     		statement.setQueryTimeout(30);  // set timeout to 30 sec.
     		ResultSet rs;
-    		if ( word.equals("lol") )
+    		if ( word.equals("") )
     			rs = statement.executeQuery("select * from songs");
     		else
     			rs = statement.executeQuery("select * from songs where title like \"%"+word+"%\"");
@@ -129,6 +136,16 @@ public class SplayerDataManager extends Observable {
         playlist.addAt(music, index);
         setChanged();
         notifyObservers("playlistUpdate");
+    }
+    
+    public void addRandomMusic()
+    {
+        int randomindex = (int)(Math.random() * cache.length);
+        try {
+        addToPlaylistAt(new Music(cache[randomindex]), playlist.getSize());
+        } catch (Exception e) {
+            System.err.println("Splayer:DataMaanger: Unable to load music from " + cache[randomindex] );
+        }
     }
     
     /**

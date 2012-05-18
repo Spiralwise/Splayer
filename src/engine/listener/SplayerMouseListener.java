@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JTable;
 
 import engine.Player;
 import engine.SplayerEngine;
@@ -31,6 +32,9 @@ public class SplayerMouseListener extends MouseAdapter
             // ... sur une JList (normalement, la playlist)
             if( event.getSource() instanceof JList )
                 engine.playThisMusic( ((JList)event.getSource()).getSelectedIndex() );
+            // ... sur une JTable (normalement, la bibliotheque)
+            else if( event.getSource() instanceof JTable )
+                engine.addRandomMusic();
         }
     }
     

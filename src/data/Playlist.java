@@ -41,6 +41,11 @@ public class Playlist {
         return index;
     }
     
+    public int getSize()
+    {
+        return list.getSize();
+    }
+    
     /**
      * @param forward Si vraie, alors passe ˆ la musique suivante. Sinon passe ˆ la musique prŽcŽdente.
      */
@@ -60,11 +65,7 @@ public class Playlist {
     }
     
     /**
-<<<<<<< HEAD
-     * Ajoute une musique ˆ la fin de la playlist.
-=======
      * Ajoute une musique a la fin de la playlist.
->>>>>>> upstream/master
      * @param music
      */
     public void add(Music music)

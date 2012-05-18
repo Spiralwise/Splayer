@@ -41,7 +41,8 @@ public class MusicHandler extends TransferHandler {
     public boolean canImport(TransferSupport info)
     {
         if(info.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-                || info.isDataFlavorSupported(TransferableMusic.musicFlavor))
+                || info.isDataFlavorSupported(TransferableMusic.musicFlavor)
+                || info.isDataFlavorSupported(DataFlavor.stringFlavor))
             return true;
         return false;
     }
@@ -66,12 +67,17 @@ public class MusicHandler extends TransferHandler {
         }
         // Importation en interne (d'une musique au sein de la playlist ou depuis la bibliothèque)
         else if(info.isDataFlavorSupported(TransferableMusic.musicFlavor))
-        {
+        {// NOTE Mode avancée pas développé.
             JList list = ((JList)info.getComponent());
             int insertindex = list.getDropLocation().getIndex();
             if( selectedindex != insertindex)
                 sdm.moveMusic(selectedindex, insertindex);
             return true;
+        }
+        // Importation basique depuis la playlist
+        else if(info.isDataFlavorSupported(DataFlavor.stringFlavor))
+        {
+            sdm.addRandomMusic();
         }
         return false;
     }

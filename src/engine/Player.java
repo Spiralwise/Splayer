@@ -117,6 +117,15 @@ public class Player extends Observable {
             Play();
     }
     
+    public void setPathAndPlay(String path)
+    {
+        currentPath = path;
+        if( state == PLAY )
+            Play();
+        else
+            PlayPause();
+    }
+    
     public int getPlayerState() {
         return state;
     }
@@ -290,5 +299,7 @@ public class Player extends Observable {
             }
         }
     }
+
+   
     
 }
