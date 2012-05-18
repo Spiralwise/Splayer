@@ -20,77 +20,65 @@ public class Library extends AbstractTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
     // Les entetes du tableau
 	private final String[] entetes = {"Titre", "Artiste", "Album", "Annee", "Genre", "Duree"};
 	private final List<Music> musiques = new ArrayList<Music>();
-
     
     public Library() {
         super();
-			musiques.add(new Music("Ms. Hospital Corners","The Envy Corps","It Cults You",2011,"Rock",310000));
-			musiques.add(new Music("Ya Mama","Fatboy Slim","Halfway Between The Gutter And The Stars",2000,"Electro",338000));
-		try {
-			this.connectLibrary("./data/mp3database.sqlite");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
-		} catch (TagException e) {
-			e.printStackTrace();
-		}
-    }
+	}
 
-    public void connectLibrary(String path) throws ClassNotFoundException, IOException, TagException,NumberFormatException{
-    	// load the sqlite-JDBC driver using the current class loader
-    	Class.forName("org.sqlite.JDBC");
-    	Connection connection = null;
-    	try
-    	{
-    		// create a database connection
-    		connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-    		Statement statement = connection.createStatement();
-    		statement.setQueryTimeout(30);  // set timeout to 30 sec.
-
-    		ResultSet rs = statement.executeQuery("select * from songs");
-    		int i=1;
-    		while(rs.next())
-    		{
-    			// read the result set
-//    			System.out.println(i + " " + rs.getString("album") + " " + rs.getString("artist") + " " +
-//    					rs.getString("title") + " " + rs.getString("genre") + " " + rs.getString("year") + " " + rs.getString("duration"));
-//    			i++;
-
-    			// transfere les donnees dans le tableau
-    			this.musiques.add(new Music(
-    					rs.getString("title"),
-		    			rs.getString("artist"),
-		    			rs.getString("album"),
-		    			Integer.valueOf(rs.getString("year")),
-		    			rs.getString("genre"),
-		    			Integer.valueOf(MntoMs(rs.getString("duration")))));
-    		}
-    	}
-    	catch(SQLException e)
-    	{
-    		// if the error message is "out of memory", 
-    		// it probably means no database file is found
-    		System.err.println(e.getMessage());
-    	}
-    	finally
-    	{
-    		try
-    		{
-    			if(connection != null)
-    				connection.close();
-    		}
-    		catch(SQLException e)
-    		{
-    			// connection close failed.
-    			System.err.println(e);
-    		}
-    	}
-    }
+//    public void connectLibrary(String path) throws ClassNotFoundException, IOException, TagException,NumberFormatException{
+//    	// load the sqlite-JDBC driver using the current class loader
+//    	Class.forName("org.sqlite.JDBC");
+//    	Connection connection = null;
+//    	try
+//    	{
+//    		// create a database connection
+//    		connection = DriverManager.getConnection("jdbc:sqlite:" + path);
+//    		Statement statement = connection.createStatement();
+//    		statement.setQueryTimeout(30);  // set timeout to 30 sec.
+//
+//    		ResultSet rs = statement.executeQuery("select * from songs");
+//    		int i=1;
+//    		while(rs.next())
+//    		{
+//    			// read the result set
+////    			System.out.println(i + " " + rs.getString("album") + " " + rs.getString("artist") + " " +
+////    					rs.getString("title") + " " + rs.getString("genre") + " " + rs.getString("year") + " " + rs.getString("duration"));
+////    			i++;
+//
+//    			// transfere les donnees dans le tableau
+//    			this.musiques.add(new Music(
+//    					rs.getString("title"),
+//		    			rs.getString("artist"),
+//		    			rs.getString("album"),
+//		    			Integer.valueOf(rs.getString("year")),
+//		    			rs.getString("genre"),
+//		    			Integer.valueOf(MntoMs(rs.getString("duration")))));
+//    		}
+//    	}
+//    	catch(SQLException e)
+//    	{
+//    		// if the error message is "out of memory", 
+//    		// it probably means no database file is found
+//    		System.err.println(e.getMessage());
+//    	}
+//    	finally
+//    	{
+//    		try
+//    		{
+//    			if(connection != null)
+//    				connection.close();
+//    		}
+//    		catch(SQLException e)
+//    		{
+//    			// connection close failed.
+//    			System.err.println(e);
+//    		}
+//    	}
+//    }
     
 //    public void addSong(Music music){
 //    	this.musiques.add(music);
@@ -99,6 +87,12 @@ public class Library extends AbstractTableModel {
     public void addSong(Music music){
     	this.musiques.add(music);
     }
+    
+    public void ClearAll()
+    {
+    	this.musiques.clear();
+    }
+    
     /**
      * @return le nombre de ligne du tableau
      */
@@ -145,12 +139,4 @@ public class Library extends AbstractTableModel {
         }
     }
     
-    public int MntoMs(String value){
-    	StringTokenizer token = new StringTokenizer(value,":");
-    	int minutes = Integer.valueOf(token.nextToken());
-//    	System.out.println("les minutes "+minutes);
-    	int secondes = Integer.valueOf(token.nextToken());
-//    	System.out.println("les secondes "+secondes);
-    	return (minutes*60+secondes)*1000;
-    }
 }

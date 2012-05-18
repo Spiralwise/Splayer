@@ -1,18 +1,22 @@
 package view;
 
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.AbstractAction;
+import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.event.ChangeListener;
 
+import data.Library;
 import data.Music;
 import data.SplayerDataManager;
 import engine.Player;
 import engine.action.ActionOpenPlaylist;
+import engine.listener.SplayerKeyListener;
 import engine.listener.SplayerSliderListener;
 import engine.listener.SplayerVolumeListener;
 import engine.listener.SplayerWindowListener;
@@ -43,18 +47,22 @@ public class SplayerViewManager implements Observer {
     {
         String argument = (String)obj;
         
-        // Mise à jour du timer
+        // Mise a jour du timer
         if( argument.equals("timerUpdate") )
     		updateTimer( Math.round( ((Player)model).getPosition() ) );
-        // Mise à jour de la sélection (changement de musique)
+        // Mise a jour de la selection (changement de musique)
         if( argument.equals("playlistSelection") ) {
             Music current = ((SplayerDataManager)model).getCurrentMusic();
             this.viewMain.updateData(current);
         }
-        // Ajout d'une musique à playlist
+        // Ajout d'une musique a playlist
         else if( argument.equals("playlistUpdate") ) { // TODO cette update semble inutile ?
             this.viewPlaylist.setPlaylist( ((SplayerDataManager)model).getPlaylist());
         }
+        else if ( argument.equals("libraryUpdate") ) {
+        	this.viewPlaylist.setLibrary( ((SplayerDataManager)model).getLibrary() );
+        }
+        	
         // Modification du volume
         else if( argument.equals("volumeUpdate") ) {
             this.viewMain.setDisplay("volume", "" + Math.round(((Player)model).getVolume()*100) );
@@ -81,9 +89,9 @@ public class SplayerViewManager implements Observer {
 
     /* Interface stage */
     /**
-     * Assopcie un bouton avec une action. Attention, ceci pourrait être modifié si tous les boutons sont gérés par le SplayerViewManager.
-     * @param buttonName code bouton à associer (ex: "play" pour le bouton de lecture/pause)
-     * @param action AbstractAction à associer
+     * Associe un bouton avec une action. Attention, ceci pourrait ÔøΩtre modifi≈Ω si tous les boutons sont g≈Ωr≈Ωs par le SplayerViewManager.
+     * @param buttonName code bouton ÀÜ associer (ex: "play" pour le bouton de lecture/pause)
+     * @param action AbstractAction ÀÜ associer
      */
     public void setAction(String buttonName, AbstractAction action)
     {
@@ -106,9 +114,12 @@ public class SplayerViewManager implements Observer {
         // Listener pour le slider de lecture
         else if( listener instanceof SplayerSliderListener )
             viewMain.addSliderListener(listener);
-        // Listener de fenêtre principale
+        // Listener de fenetre principale
         else if( listener instanceof SplayerWindowListener )
             viewMain.addWindowListener((WindowListener)listener);
+        // Listener de barre de recherche
+        else if( listener instanceof SplayerKeyListener )
+        	viewPlaylist.setSearchListener((KeyListener)listener);
     }
     
     public void setPlaylistHandler(TransferHandler handler)

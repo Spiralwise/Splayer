@@ -1,29 +1,39 @@
 package engine;
 
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.farng.mp3.TagException;
+
 import view.ActionShuffle;
 import view.SplayerViewManager;
+import data.Library;
+import data.Music;
 import data.MusicHandler;
 import data.SplayerDataManager;
+import engine.Player.ForwardThread;
 import engine.action.ActionEmpty;
 import engine.action.ActionNextMusic;
 import engine.action.ActionPlay;
 import engine.action.ActionPreviousMusic;
 import engine.action.ActionRemoveItem;
+import engine.listener.SplayerKeyListener;
 import engine.listener.SplayerMouseListener;
 import engine.listener.SplayerSliderListener;
 import engine.listener.SplayerVolumeListener;
 import engine.listener.SplayerWindowListener;
 
-public class SplayerEngine implements Observer {
+public class SplayerEngine extends Thread implements Observer {
 
     /* Data stage */
     private Player player;
     private SplayerDataManager sdm;
     private SplayerViewManager svm;
+    boolean TimerState;
+    private TimerThread timer;
     
         // Internal data
     private int selectedIndex;
@@ -57,16 +67,19 @@ public class SplayerEngine implements Observer {
         this.svm.setListener("PLAYER", new SplayerSliderListener(this));
         
         // Action mapping
-            // TODO gros todo ! Certaines actions sont relayées par l'engine vers le sdm alors que le sdm pourrait être directement contacté (mais est-ce encore du MVC dans ce cas ?)
+            // TODO gros todo ! Certaines actions sont relayees par l'engine vers le sdm alors que le sdm pourrait etre directement contacte (mais est-ce encore du MVC dans ce cas ?)
         this.svm.setAction("play", new ActionPlay(this));
         this.svm.setAction("next", new ActionNextMusic(this));
         this.svm.setAction("previous", new ActionPreviousMusic(this));
         this.svm.setAction("shuffle", new ActionShuffle(this));
         this.svm.setAction("removeItem", new ActionRemoveItem(this));
-        this.svm.setAction("empty", new ActionEmpty(this));
-            // Action by listener
+        // Loading music samples
+
+        // Action by listener
         this.svm.setListener("forward", actionMouse);
         this.svm.setListener("rewind", actionMouse);
+        this.svm.setListener("typingArea", new SplayerKeyListener(this));
+        
         
         // Handler mapping
         this.svm.setPlaylistHandler(new MusicHandler(this.sdm));
@@ -102,7 +115,7 @@ public class SplayerEngine implements Observer {
     }
 
     /**
-     * D≈Ωmarre/arrete la lecture de la musique en cours.
+     * Demarre/arrete la lecture de la musique en cours.
      */
     public void playPause()
     {
@@ -112,15 +125,15 @@ public class SplayerEngine implements Observer {
     }
     
     /**
-     * Arrête la musique en cours de lecture.
+     * Arrete la musique en cours de lecture.
      */
-    public void stop()
-    {
-        player.Stop();
-    }
+//    public void stop()
+//    {
+//        player.Stop();
+//    }
     
     /**
-     * Passe à la musique suivante dans la playlist et la joue si la lecture est en cours.
+     * Passe ÔøΩ la musique suivante dans la playlist et la joue si la lecture est en cours.
      */
     public void nextMusic()
     {
@@ -128,7 +141,7 @@ public class SplayerEngine implements Observer {
     } // TODO Si l'utilisateur a desactive le bouclage, ca ne doit pas boucler !!!!!
     
     /**
-     * Passe ÀÜ la musique pr≈Ωc≈Ωdente dans la playlist et la joue si la lecture est en cours.
+     * Passe a la musique precedente dans la playlist et la joue si la lecture est en cours.
      */
     public void previousMusic()
     {
@@ -146,7 +159,7 @@ public class SplayerEngine implements Observer {
 
     /**
      * Modifie le volume
-     * @param value valeur du volume de 0 à 100 (0 étant le son coupé)
+     * @param value valeur du volume de 0 ÔøΩ 100 (0 ÔøΩtant le son coupÔøΩ)
      */
     public void setVolume(int value)
     {
@@ -154,7 +167,7 @@ public class SplayerEngine implements Observer {
     }
 
     /**
-     * Déplace la tête de lecture à la position indiquée en seconde
+     * DÔøΩplace la tÔøΩte de lecture ÔøΩ la position indiquÔøΩe en seconde
      * @param value position en milliseconde
      */
     public void moveReadHead(int positionInMilliSec)
@@ -163,7 +176,7 @@ public class SplayerEngine implements Observer {
     }
     
     /**
-     * Déclenche le forward ou le rewind.
+     * DÔøΩclenche le forward ou le rewind.
      * @param way Player.FORWARD ou Player.REWIND
      */
     public void triggerForward(int way)
@@ -181,7 +194,7 @@ public class SplayerEngine implements Observer {
     }
     
     /**
-     * Mélange la playlist.
+     * MÔøΩlange la playlist.
      */
     public void shufflePlaylist()
     {
@@ -190,11 +203,11 @@ public class SplayerEngine implements Observer {
 
     /* Restricted stage */
     /**
-     * Méthode réservée au SplayerEngine pour connaître à tout moment
-     * quelle musique est sélectionnée dans la liste. Attention, à
+     * MÔøΩthode rÔøΩservÔøΩe au SplayerEngine pour connaÔøΩtre ÔøΩ tout moment
+     * quelle musique est sÔøΩlectionnÔøΩe dans la liste. Attention, ÔøΩ
      * ne pas confondre avec la musique en cours de lecture.
      * L'utilisateur peut cliquer sur une musique sans la jouer.
-     * Cette méthode est uniquement appelée par un event pour renseigner le
+     * Cette mÔøΩthode est uniquement appelÔøΩe par un event pour renseigner le
      * SplayerEngine.
      * @param selectedIndex
      */
@@ -204,7 +217,7 @@ public class SplayerEngine implements Observer {
     }
 
     /**
-     * Méthode réservée.
+     * MÔøΩthode rÔøΩservÔøΩe.
      */
     public void removeSelectedMusic()
     {
@@ -219,6 +232,74 @@ public class SplayerEngine implements Observer {
     public void emptyPlaylist()
     {
         sdm.emptyPlaylist();
-    } 
+    }
     
+    /**
+     * Recherche du mot en param dans la libraire
+     * @param word le mot a rechercher dans la librairie
+     * @throws TagException 
+     * @throws IOException 
+     * @throws ClassNotFoundException 
+     * @throws NumberFormatException 
+     */
+    public void search(String word)
+    {
+    	//System.out.println(word);
+    	sdm.connect(word);
+    }
+    /**
+     * D√©clanche un timer de 200ms avant d'effectuer la recherche
+     */
+	public void runTimer(String word)
+	{
+		if (timer==null || !timer.isAlive()) {
+		    timer = new TimerThread(word);
+		    timer.start();
+		} else {
+			timer.resetTimer(word);
+		}
+	}
+	
+    /**
+     * Arrete le timer
+     */
+    public void stopTimer()
+    {
+        timer.interrupt();
+    }
+	
+	class TimerThread extends Thread {
+		private static final int TimerDuration = 200; // en ms
+		private int currentTime, step;
+		private String word;
+		
+		public TimerThread(String word)
+		{
+			this.word 	= word;
+			currentTime	= 0;
+			step		= TimerDuration/10;
+		}
+		
+		public void resetTimer(String word)
+		{
+			currentTime=0;
+			this.word=word;
+		}
+		
+		public void run()
+		{
+			try {
+				while (currentTime < TimerDuration)
+				{
+					Thread.sleep(step);
+					currentTime+=step;
+				}
+				search(this.word);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(("c good"));
+		}
+	}
 }

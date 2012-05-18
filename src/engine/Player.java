@@ -84,7 +84,7 @@ public class Player extends Observable {
         PlayPause();
     }
     
-    public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrête la musique.
+    public void Stop(){ // TODO Mhh... Il y a de la latence quand on arrÔøΩte la musique.
         if(state == LOAD || state == PLAY) {
             state = STOP;
             player.close();
@@ -92,8 +92,8 @@ public class Player extends Observable {
     }
     
     /**
-     * Modifie le path de la musique à jouer.
-     * Si la musique est en cours de lecture, il passe à celle-ci.
+     * Modifie le path de la musique ÀÜ jouer.
+     * Si la musique est en cours de lecture, il passe ÀÜ celle-ci.
      * @param path
      */
     public void setPath(String path) {
@@ -110,7 +110,7 @@ public class Player extends Observable {
         return volume;
     }
     
-    // TODO Apparemment c'est en valeur logarithmique ! Conversion nécessaire pour être user-friendly
+    // TODO Apparemment c'est en valeur logarithmique ! Conversion n≈Ωcessaire pour ÔøΩtre user-friendly
     public void setVolume(float level){
         volume = level;
         if( player != null)
@@ -139,8 +139,8 @@ public class Player extends Observable {
     }
     
     /**
-     * Déclenche le forward
-     * @param rewind si true, alors déclenche le rewind
+     * D≈Ωclenche le forward
+     * @param rewind si true, alors d≈Ωclenche le rewind
      */
     public void doForward(boolean rewind)
     {
@@ -149,7 +149,7 @@ public class Player extends Observable {
     }
     
     /**
-     * Arrête le forward ou le rewind
+     * ArrÔøΩte le forward ou le rewind
      */
     public void stopForward()
     {
@@ -199,7 +199,7 @@ public class Player extends Observable {
     }
 
     /**
-     * Gère le forward/rewind en thread pour une meilleure efficacité.
+     * Gere le forward/rewind en thread pour une meilleure efficacite.
      */
     class ForwardThread extends Thread {
         
@@ -235,7 +235,7 @@ public class Player extends Observable {
             } catch (InterruptedException e) {
                 if(wasPlaying) {
                     Play();
-                    setPosition(position); // TODO Passer à la musique suivante si on arrive au bout (ce qui n'est pour l'instant n'est pas facile à détecter ...
+                    setPosition(position); // TODO Passer a la musique suivante si on arrive au bout (ce qui n'est pour l'instant n'est pas facile ÀÜ d≈Ωtecter ...
                 }
                 //e.printStackTrace();
             }

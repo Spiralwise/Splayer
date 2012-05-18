@@ -18,7 +18,7 @@ public class SplayerSliderListener implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent event)
     {
-        if( ((JSlider)event.getSource()).getValueIsAdjusting() ) // Empêche de rappeler le listener récursivement (puisque c'est un changement d'état)
+        if( ((JSlider)event.getSource()).getValueIsAdjusting() ) // Empeche de rappeler le listener recursivement (puisque c'est un changement d'etat)
             engine.moveReadHead( (int) ((JSlider)event.getSource()).getValue() );
     }
 
