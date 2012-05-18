@@ -60,7 +60,11 @@ public class Playlist {
     }
     
     /**
+<<<<<<< HEAD
+     * Ajoute une musique ˆ la fin de la playlist.
+=======
      * Ajoute une musique a la fin de la playlist.
+>>>>>>> upstream/master
      * @param music
      */
     public void add(Music music)

@@ -29,6 +29,7 @@ public class Music extends Mp3File {
     private String splayerTitle;
     private String splayerAlbum;
     private String splayerGenre;
+
     private int splayerDuration; // En ms
     private int splayerYear;
     
@@ -136,7 +137,7 @@ public class Music extends Mp3File {
     }
 
     /**
-     * Durée en milliseconde
+     * Duree en milliseconde
      * @return
      */
     public int getDuration()
@@ -145,7 +146,7 @@ public class Music extends Mp3File {
     }
     
     /**
-     * Durée en seconde
+     * Duree en seconde
      * @return
      */
     public int getDurationInSec()

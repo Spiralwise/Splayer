@@ -1,7 +1,13 @@
 package data;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Observable;
+import java.util.StringTokenizer;
 
 import javax.swing.DefaultListModel;
 
@@ -22,12 +28,14 @@ public class SplayerDataManager extends Observable {
         this.library = new Library();
         
         // Loading music samples
+        this.connect("lol");
+        
          try {
+			playlist.add(new Music("./data/music/Sonic 3 - Credits [Pitched Up].mp3"));
 			playlist.add(new Music("./data/music/01 Act On Instinct.mp3"));
 			playlist.add(new Music("./data/music/01 Hell March.mp3"));
-			playlist.add(new Music("./data/music/13 School.mp3"));
-			playlist.add(new Music("./data/music/Sonic 3 - Hydrocity Zone Act 2 [Pitched Up].mp3"));
 			playlist.add(new Music("./data/music/01 Head Like A Hole.mp3"));
+			playlist.add(new Music("./data/music/02 Quake Main Theme.mp3"));
         } catch (IOException e) {
             System.err.println("Splayer:DataManager: Can't open file.");
             e.printStackTrace();
@@ -48,15 +56,71 @@ public class SplayerDataManager extends Observable {
     
     /* Implementation stage */
     
-    /**
-     * Connecte la librairie ‡ la base sql
-     * @throws TagException 
-     * @throws IOException 
-     */
-    // TODO Pas de code ? Vérifier que ça existait déjà. Sinon implémenter
+    public void connect(String word)
+    {
+		Connection connection = null;
 
+    	try {
+        	// load the sqlite-JDBC driver using the current class loader
+    		Class.forName("org.sqlite.JDBC");
+    		
+    		// create a database connection
+    		connection = DriverManager.getConnection("jdbc:sqlite:" + "./data/mp3database.sqlite");
+    		Statement statement = connection.createStatement();
+    		statement.setQueryTimeout(30);  // set timeout to 30 sec.
+    		ResultSet rs;
+    		if ( word.equals("lol") )
+    			rs = statement.executeQuery("select * from songs");
+    		else
+    			rs = statement.executeQuery("select * from songs where title like \"%"+word+"%\"");
+//    			rs = statement.executeQuery("select * from songs where title=\""+word+"\"");
+//    					"" OR artist=\""+word+"\" OR album=\""+word+"\" OR genre=\""+word+"\"");
+		
+    		this.library.ClearAll();
+    		while(rs.next())
+			{
+				// transfere les donnees dans le tableau
+				this.library.addSong(new Music(
+							rs.getString("title"),
+							rs.getString("artist"),
+							rs.getString("album"),
+							Integer.valueOf(rs.getString("year")),
+							rs.getString("genre"),
+							Integer.valueOf(MntoMs(rs.getString("duration")))));
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+    		System.err.println(e.getMessage());
+    	} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally {
+    		try
+    		{
+    			if(connection != null)
+    				connection.close();
+    		}
+    		catch(SQLException e)
+    		{
+    			// connection close failed.
+    			System.err.println(e);
+    		}
+    	}
+    	setChanged();
+    	notifyObservers("libraryUpdate");
+    }
+
+    private int MntoMs(String value){
+    	StringTokenizer token = new StringTokenizer(value,":");
+    	int minutes = Integer.valueOf(token.nextToken());
+//    	System.out.println("les minutes "+minutes);
+    	int secondes = Integer.valueOf(token.nextToken());
+//    	System.out.println("les secondes "+secondes);
+    	return (minutes*60+secondes)*1000;
+    }
+    
     /**
-     * Ajoute une musique à la playlist courrante à l'emplacement indiqué.
+     * Ajoute une musique ÀÜ la playlist courrante ÀÜ l'emplacement indiqu≈Ω.
      * @param music
      * @param index
      */
@@ -75,10 +139,18 @@ public class SplayerDataManager extends Observable {
     {
         return playlist.getList();
     }
+    
+    /**
+     * Retourne la librairie
+     * @return
+     */
+    public Library getLibrary() {
+    	return this.library;
+    }
 
     /**
-     * Renvoie le path de la musique en cours de lecture à charger.
-     * @return path de la musique en cours, null si l'index ne correspond à aucune musique en cours
+     * Renvoie le path de la musique en cours de lecture ÀÜ charger.
+     * @return path de la musique en cours, null si l'index ne correspond ÀÜ aucune musique en cours
      */
     public String getCurrentMusicPath()
     {
@@ -95,9 +167,9 @@ public class SplayerDataManager extends Observable {
     }
     
     /**
-     * Passe à la musique suivante ou précédente.
-     * @param forward Si vraie, passe à la musique suivante, sinon à la musique précédente.
-     * @return path de la musique suivante/précédente
+     * Passe ÀÜ la musique suivante ou pr≈Ωc≈Ωdente.
+     * @param forward Si vraie, passe ÀÜ la musique suivante, sinon ÀÜ la musique pr≈Ωc≈Ωdente.
+     * @return path de la musique suivante/pr≈Ωc≈Ωdente
      */
     public String nextMusic(boolean forward)
     {
@@ -108,9 +180,9 @@ public class SplayerDataManager extends Observable {
     }
 
     /**
-     * Sélectionne une musique dans la playlist.
-     * @param playlistIndex index de playlist de la musique à jouer
-     * @return path de la musique sélectionnée, null si l'index ne correspond à aucune musique
+     * S≈Ωlectionne une musique dans la playlist.
+     * @param playlistIndex index de playlist de la musique ÀÜ jouer
+     * @return path de la musique s≈Ωlectionn≈Ωe, null si l'index ne correspond ÀÜ aucune musique
      */
     public String selectMusic(int playlistIndex)
     {
@@ -121,8 +193,8 @@ public class SplayerDataManager extends Observable {
     }
     
     /**
-     * Déplace une musique dans la playlist.
-     * @param selectedindex index de la musique à déplacer
+     * D≈Ωplace une musique dans la playlist.
+     * @param selectedindex index de la musique ÀÜ d≈Ωplacer
      * @param insertindex index de destination, la musique qui s'y trouvait se placera juste en dessous
      */
     public void moveMusic(int selectedindex, int insertindex)
