@@ -56,7 +56,11 @@ public class Playlist {
     }
     
     /**
+<<<<<<< HEAD
      * Ajoute une musique ÀÜ la fin de la playlist.
+=======
+     * Ajoute une musique a la fin de la playlist.
+>>>>>>> upstream/master
      * @param music
      */
     public void add(Music music)
@@ -67,15 +71,27 @@ public class Playlist {
     }
     
     /**
+     * Ajoute une musique a l'emplacement indique.
+     * @param music
+     * @param insertindex
+     */
+    public void addAt(Music music, int insertindex)
+    {
+        list.add(insertindex, music);
+        // Recaller l'index courrant en conséquence
+        if( insertindex < index )
+            index++;
+    }
+    
+    /**
      * Retourne l'objet musique en cours de lecture.
      * @return l'objet musique en cours de lecture
      */
     public Music getCurrentMusic()
     {
-        if( index != -1 )
-            return (Music)list.getElementAt(index);
-        else
+        if( index < 0 )
             return null;
+        return (Music)list.getElementAt(index);            
     }
     
     /**
@@ -84,7 +100,7 @@ public class Playlist {
      */
     public String getCurrentMusicPath()
     {
-        if( index == -1 )
+        if( index < 0 )
             return null;
         return ((Music)list.getElementAt(index)).getPath();
     }
@@ -99,5 +115,67 @@ public class Playlist {
         if( playlistIndex < 0 || playlistIndex >= list.getSize() )
             index = -1;
         index = playlistIndex;
+    }
+
+    /**
+     * Déplace une musique dans la playlist.
+     * @param selectedindex index de la musique à déplacer
+     * @param insertindex index de destination, la musique qui s'y trouvait se placera juste en dessous
+     */
+    public void move(int selectedindex, int insertindex)
+    {
+        if( selectedindex != insertindex ) { // Condition initiale, les deux indexs doivent être différents, sinon ça ne sert à rien de déplacer.
+            list.add(insertindex, (Music)list.get(selectedindex));
+            if( insertindex < selectedindex ) {
+                selectedindex++;
+                index++;
+            }
+            else
+                index--;
+            list.remove(selectedindex);
+        }
+    }
+    
+    /**
+     * Retire une musique de la playlist.
+     * @param removeindex index de la musique à supprimer
+     */
+    public void remove(int removeindex)
+    {
+        if( removeindex > 0 || removeindex < list.getSize() ) {
+            list.remove(removeindex);
+            if( removeindex > index )
+                index--;
+            if( index < -1 && !list.isEmpty() )
+                index = 0;
+        }
+    }
+    
+    /**
+     * Vide la playlist.
+     */
+    public void empty()
+    {
+        list.removeAllElements();
+        index = -1;
+    }
+    
+    /**
+     * Ordonne aléatoirement la liste.
+     */
+    public void shuffle()
+    {
+        DefaultListModel buffer = new DefaultListModel();
+        Music bufferMusic = (Music)list.elementAt(index);
+        int i;
+        while(!list.isEmpty()) {
+            i = (int)(Math.random() * list.getSize());
+            buffer.addElement(list.remove(i));
+        }
+        while(!buffer.isEmpty()) { // TODO Je suis persuadé qu'il y a une méthode plus propre (je pensais qu'en référençant list avec buffer, ça suffirait....
+            list.addElement(buffer.remove(0));
+        }
+        // Restauration de l'index
+        index = list.indexOf(bufferMusic);
     }
 }

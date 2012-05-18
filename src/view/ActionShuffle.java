@@ -1,4 +1,4 @@
-package engine.action;
+package view;
 
 import java.awt.event.ActionEvent;
 
@@ -7,21 +7,20 @@ import javax.swing.ImageIcon;
 
 import engine.SplayerEngine;
 
-@SuppressWarnings("serial")
-public class ActionPreviousMusic extends AbstractAction {
+public class ActionShuffle extends AbstractAction {
 
     private SplayerEngine engine;
     
-    public ActionPreviousMusic(SplayerEngine engine)
+    public ActionShuffle(SplayerEngine engine)
     {
-        super("", new ImageIcon("./data/icon/media-previous.png"));
+        super("", new ImageIcon("./data/icon/media-shuffle.png"));
         this.engine = engine;
     }
     
     @Override
     public void actionPerformed(ActionEvent event)
     {
-        this.engine.previousMusic();
+        engine.shufflePlaylist();
     }
 
 }

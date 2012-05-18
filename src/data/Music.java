@@ -1,6 +1,13 @@
 package data;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
+import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
 import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.ID3v2;
@@ -22,7 +29,8 @@ public class Music extends Mp3File {
     private String splayerTitle;
     private String splayerAlbum;
     private String splayerGenre;
-    private int splayerDuration;
+
+    private int splayerDuration; // En ms
     private int splayerYear;
     
     /**
@@ -32,6 +40,7 @@ public class Music extends Mp3File {
      * @throws InvalidDataException 
      * @throws UnsupportedTagException 
      */
+    @SuppressWarnings("rawtypes")
     public Music(String filename) throws IOException, UnsupportedTagException, InvalidDataException
     {
         super(filename);
@@ -65,6 +74,21 @@ public class Music extends Mp3File {
         else {
             // TODO Que faire en cas d'absence de tags ID3 ?
         }
+        // Récupération de la durée
+        try {
+            AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(new File(filename));
+            Map properties = baseFileFormat.properties();
+            splayerDuration = (int) ( ((Long)properties.get("duration")).intValue() / 1000 );
+            //duration = (int) ( frames / format.getFrameRate() * 1000 );
+        } catch (UnsupportedAudioFileException e) {
+            splayerDuration = 0;
+            e.printStackTrace();
+        }
+        
+        // Nettoyage des informations nulls
+        if( this.splayerAuthor == null ) this.splayerAuthor = "Auteur inconnu";
+        if( this.splayerTitle == null ) this.splayerTitle = "Titre inconnu";
+        if( this.splayerAlbum == null ) this.splayerAlbum = "Album inconnu";
     }
     
     /**
@@ -111,11 +135,25 @@ public class Music extends Mp3File {
     {
         return splayerYear;
     }
-    
+
+    /**
+     * Duree en milliseconde
+     * @return
+     */
     public int getDuration()
     {
         return splayerDuration;
     }
+    
+    /**
+     * Duree en seconde
+     * @return
+     */
+    public int getDurationInSec()
+    {
+        return (int) (splayerDuration/1000);
+    }
+    
     /**
      * 
      * @return chemin relatif du fichier mp3
@@ -128,6 +166,6 @@ public class Music extends Mp3File {
 
     public String toString()
     {
-        return this.getId3v2Tag().getTitle();
+        return splayerAuthor + " - " + splayerTitle;
     }
 }
